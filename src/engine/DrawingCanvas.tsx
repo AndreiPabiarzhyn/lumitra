@@ -225,6 +225,11 @@ export function DrawingCanvas() {
         return;
       }
 
+      if (!window.confirm('Сохрани проект перед созданием нового файла. Создать новый файл?')) {
+        useProjectStore.getState().setStatus('New project cancelled');
+        return;
+      }
+
       manager.reset(width, height);
       textManagerRef.current?.restore([]);
       renderer.setCanvasFrame(width, height);
@@ -317,6 +322,24 @@ export function DrawingCanvas() {
       }
     };
 
+    const deleteLayer = async (id: string) => {
+      const manager = layerManagerRef.current;
+
+      if (!manager) {
+        return;
+      }
+
+      historyRef.current?.capture();
+      if (manager.deleteLayer(id)) {
+        textManagerRef.current?.clearLayer(id);
+        layerRendererRef.current?.sync(manager.getLayers());
+        syncLayerStoreFromManager();
+        useProjectStore.getState().setStatus('Layer deleted');
+      } else {
+        useProjectStore.getState().setStatus('Cannot delete last layer');
+      }
+    };
+
     const moveLayer = async (id: string, direction: 'up' | 'down') => {
       const manager = layerManagerRef.current;
 
@@ -371,16 +394,64 @@ export function DrawingCanvas() {
         return;
       }
 
-      const layer = manager.getActiveLayer();
+      historyRef.current?.capture();
+      const layer = manager.createEmptyLayer();
+      layer.name = file.name.replace(/\.[^.]+$/, '') || 'Imported image';
 
-      if (!layer || layer.locked) {
-        useProjectStore.getState().setStatus('Active layer locked');
+      await layer.drawImageFile(file);
+      layerRendererRef.current?.sync(manager.getLayers());
+      syncLayerStoreFromManager();
+      useProjectStore.getState().setStatus('Image imported');
+    };
+
+    const restoreHistory = async (direction: 'undo' | 'redo') => {
+      const history = historyRef.current;
+
+      if (!history) {
         return;
       }
 
-      historyRef.current?.capture();
-      await layer.drawImageFile(file);
-      useProjectStore.getState().setStatus('Image imported');
+      const changed = direction === 'undo' ? await history.undo() : await history.redo();
+
+      if (changed) {
+        layerRendererRef.current?.sync(layerManagerRef.current?.getLayers() ?? []);
+        syncLayerStoreFromManager();
+        useProjectStore.getState().setStatus(direction === 'undo' ? 'Undo applied' : 'Redo applied');
+      } else {
+        useProjectStore.getState().setStatus(direction === 'undo' ? 'Nothing to undo' : 'Nothing to redo');
+      }
+    };
+
+    const ensureDrawableLayer = () => {
+      const manager = layerManagerRef.current;
+      const textManager = textManagerRef.current;
+
+      if (!manager || !textManager) {
+        return;
+      }
+
+      const activeLayer = manager.getActiveLayer();
+      const activeTool = useToolStore.getState().activeTool;
+      const shouldProtectTextLayer = [
+        'brush',
+        'mirror-brush',
+        'eraser',
+        'fill',
+        'gradient',
+        'smudge',
+        'line',
+        'rectangle',
+        'ellipse',
+      ].includes(activeTool);
+
+      if (!activeLayer || !shouldProtectTextLayer || !textManager.hasTextInLayer(activeLayer.id)) {
+        return;
+      }
+
+      const layer = manager.createEmptyLayer();
+      layerRendererRef.current?.sync(manager.getLayers());
+      syncLayerStoreFromManager();
+      useProjectStore.getState().setStatus(`Created ${layer.name} for drawing`);
     };
 
     const exportPng = async () => {
@@ -445,27 +516,11 @@ export function DrawingCanvas() {
       }
 
       if (action.type === 'undo') {
-        void historyRef.current?.undo().then((changed) => {
-          if (changed) {
-            layerRendererRef.current?.sync(layerManagerRef.current?.getLayers() ?? []);
-            syncLayerStoreFromManager();
-            useProjectStore.getState().setStatus('Undo applied');
-          } else {
-            useProjectStore.getState().setStatus('Nothing to undo');
-          }
-        });
+        void restoreHistory('undo');
       }
 
       if (action.type === 'redo') {
-        void historyRef.current?.redo().then((changed) => {
-          if (changed) {
-            layerRendererRef.current?.sync(layerManagerRef.current?.getLayers() ?? []);
-            syncLayerStoreFromManager();
-            useProjectStore.getState().setStatus('Redo applied');
-          } else {
-            useProjectStore.getState().setStatus('Nothing to redo');
-          }
-        });
+        void restoreHistory('redo');
       }
     };
 
@@ -483,6 +538,7 @@ export function DrawingCanvas() {
         toolManagerRef.current?.activateTemporaryHand();
       }
 
+      ensureDrawableLayer();
       toolManagerRef.current?.pointerDown(toToolPointer(event, app.canvas, viewport));
     };
 
@@ -529,6 +585,22 @@ export function DrawingCanvas() {
         return;
       }
 
+      const key = event.key.toLowerCase();
+      const isUndoKey = event.code === 'KeyZ' || key === 'z' || key === 'я';
+      const isRedoKey = event.code === 'KeyY' || key === 'y' || key === 'н';
+
+      if ((event.ctrlKey || event.metaKey) && isUndoKey) {
+        event.preventDefault();
+        void restoreHistory(event.shiftKey ? 'redo' : 'undo');
+        return;
+      }
+
+      if ((event.ctrlKey || event.metaKey) && isRedoKey) {
+        event.preventDefault();
+        void restoreHistory('redo');
+        return;
+      }
+
       if (event.code === 'Space') {
         event.preventDefault();
         toolManagerRef.current?.activateTemporaryHand();
@@ -555,6 +627,11 @@ export function DrawingCanvas() {
 
     const textEditing = (event: Event) => {
       isTextEditingRef.current = Boolean((event as CustomEvent<boolean>).detail);
+    };
+
+    const beforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = 'Сохрани проект перед закрытием.';
     };
 
     void app.init({
@@ -626,6 +703,7 @@ export function DrawingCanvas() {
       window.addEventListener('keydown', keyDown);
       window.addEventListener('keyup', keyUp);
       window.addEventListener('lumitra-text-editing', textEditing);
+      window.addEventListener('beforeunload', beforeUnload);
       const unsubscribeProject = useProjectStore.subscribe(handleProjectAction);
       const autosaveTimer = window.setInterval(() => {
         const project = createProject();
@@ -641,6 +719,7 @@ export function DrawingCanvas() {
         createLayer,
         duplicateLayer,
         clearLayer,
+        deleteLayer,
         moveLayer,
         saveProject,
         openProject,
@@ -655,26 +734,8 @@ export function DrawingCanvas() {
             useProjectStore.getState().setStatus('No autosave found');
           }
         },
-        undo: async () => {
-          const changed = await history.undo();
-          if (changed) {
-            renderer.sync(manager.getLayers());
-            syncLayerStoreFromManager();
-            useProjectStore.getState().setStatus('Undo applied');
-          } else {
-            useProjectStore.getState().setStatus('Nothing to undo');
-          }
-        },
-        redo: async () => {
-          const changed = await history.redo();
-          if (changed) {
-            renderer.sync(manager.getLayers());
-            syncLayerStoreFromManager();
-            useProjectStore.getState().setStatus('Redo applied');
-          } else {
-            useProjectStore.getState().setStatus('Nothing to redo');
-          }
-        },
+        undo: async () => restoreHistory('undo'),
+        redo: async () => restoreHistory('redo'),
       };
 
       cleanupRuntime = () => {
@@ -689,6 +750,7 @@ export function DrawingCanvas() {
         window.removeEventListener('keydown', keyDown);
         window.removeEventListener('keyup', keyUp);
         window.removeEventListener('lumitra-text-editing', textEditing);
+        window.removeEventListener('beforeunload', beforeUnload);
         window.lumitraActions = undefined;
       };
     });

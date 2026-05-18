@@ -1,7 +1,7 @@
 import { BrushPoint } from './types';
 import { clamp } from './BrushMath';
 
-const MAX_BUFFER_SIZE = 14;
+const MAX_BUFFER_SIZE = 36;
 
 export class Stabilizer {
   private readonly buffer: BrushPoint[] = [];
@@ -17,8 +17,8 @@ export class Stabilizer {
     }
   }
 
-  add(point: BrushPoint, strength: number): BrushPoint {
-    const normalizedStrength = clamp(strength, 0, 0.85);
+  add(point: BrushPoint, strength: number, brushSize = 10): BrushPoint {
+    const normalizedStrength = this.getEffectiveStrength(strength);
 
     if (normalizedStrength <= 0.01) {
       this.outputPoint = point;
@@ -40,16 +40,53 @@ export class Stabilizer {
       return weighted;
     }
 
-    const follow = 0.28 + (1 - normalizedStrength) * 0.52;
+    const dx = weighted.x - this.outputPoint.x;
+    const dy = weighted.y - this.outputPoint.y;
+    const distance = Math.hypot(dx, dy);
+    const radius = this.getLazyRadius(normalizedStrength, brushSize);
+
+    if (distance <= 0.001) {
+      return this.outputPoint;
+    }
+
+    const unitX = dx / distance;
+    const unitY = dy / distance;
+    const target = distance > radius
+      ? {
+          ...weighted,
+          x: weighted.x - unitX * radius,
+          y: weighted.y - unitY * radius,
+        }
+      : {
+          ...weighted,
+          x: this.outputPoint.x + dx * (0.018 + (1 - normalizedStrength) * 0.075),
+          y: this.outputPoint.y + dy * (0.018 + (1 - normalizedStrength) * 0.075),
+        };
+
+    const follow = distance > radius
+      ? clamp(0.74 - normalizedStrength * 0.6, 0.12, 0.74)
+      : clamp(0.2 - normalizedStrength * 0.15, 0.035, 0.2);
 
     this.outputPoint = {
-      x: this.outputPoint.x + (weighted.x - this.outputPoint.x) * follow,
-      y: this.outputPoint.y + (weighted.y - this.outputPoint.y) * follow,
-      pressure: weighted.pressure,
-      time: weighted.time,
+      x: this.outputPoint.x + (target.x - this.outputPoint.x) * follow,
+      y: this.outputPoint.y + (target.y - this.outputPoint.y) * follow,
+      pressure: target.pressure,
+      time: target.time,
     };
 
     return this.outputPoint;
+  }
+
+  private getEffectiveStrength(strength: number) {
+    const normalized = clamp(strength, 0, 1);
+
+    return normalized <= 0.01 ? 0 : normalized ** 0.62;
+  }
+
+  private getLazyRadius(strength: number, brushSize: number) {
+    const curved = strength ** 1.08;
+
+    return curved * (18 + clamp(brushSize, 1, 160) * 0.82);
   }
 
   private getWeightedPoint(): BrushPoint {
@@ -61,7 +98,8 @@ export class Stabilizer {
 
     for (let index = 0; index < this.buffer.length; index += 1) {
       const point = this.buffer[index];
-      const weight = (index + 1) ** 1.65;
+      const age = index / Math.max(1, this.buffer.length - 1);
+      const weight = 0.2 + age ** (1.35 + this.buffer.length / MAX_BUFFER_SIZE) * 3.1;
 
       x += point.x * weight;
       y += point.y * weight;

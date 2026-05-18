@@ -187,6 +187,28 @@ export class LayerManager {
     return true;
   }
 
+  deleteLayer(id: string) {
+    if (this.layers.length <= 1) {
+      return false;
+    }
+
+    const index = this.layers.findIndex((layer) => layer.id === id);
+
+    if (index < 0) {
+      return false;
+    }
+
+    const [layer] = this.layers.splice(index, 1);
+    layer.destroy();
+
+    if (this.activeLayerId === id) {
+      this.activeLayerId = this.layers[Math.min(index, this.layers.length - 1)]?.id ?? this.layers[0]?.id ?? '';
+    }
+
+    this.onLayerChange?.();
+    return true;
+  }
+
   moveLayer(id: string, direction: 'up' | 'down') {
     const index = this.layers.findIndex((layer) => layer.id === id);
 

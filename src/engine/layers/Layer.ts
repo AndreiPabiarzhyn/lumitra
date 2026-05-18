@@ -105,6 +105,18 @@ export class Layer {
     this.markDirty();
   }
 
+  hasPixels() {
+    const data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height).data;
+
+    for (let index = 3; index < data.length; index += 4) {
+      if (data[index] !== 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   applyDisplayState() {
     this.sprite.visible = this.visible;
     this.sprite.alpha = this.opacity;

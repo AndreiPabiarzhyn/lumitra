@@ -38,6 +38,8 @@ export function TopToolbar() {
   const presetId = useBrushStore((state) => state.presetId);
   const setSize = useBrushStore((state) => state.setSize);
   const setOpacity = useBrushStore((state) => state.setOpacity);
+  const stabilizer = useBrushStore((state) => state.stabilizer);
+  const setStabilizer = useBrushStore((state) => state.setStabilizer);
   const setPreset = useBrushStore((state) => state.setPreset);
   const text = useTextStore();
   const gradient = useGradientStore();
@@ -183,6 +185,11 @@ export function TopToolbar() {
           <span>Opacity</span>
           <input min="0.1" max="1" step="0.05" type="range" value={opacity} onChange={(event) => setOpacity(Number(event.target.value))} />
           <output>{Math.round(opacity * 100)}%</output>
+        </label>
+        <label className="top-mini-slider">
+          <span>Stabilizer</span>
+          <input min="0" max="1" step="0.05" type="range" value={stabilizer} onChange={(event) => setStabilizer(Number(event.target.value))} />
+          <output>{Math.round(stabilizer * 100)}%</output>
         </label>
       </div>
     );

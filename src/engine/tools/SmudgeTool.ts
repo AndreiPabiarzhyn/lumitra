@@ -142,9 +142,12 @@ export class SmudgeTool implements Tool {
 
   private drawCursor(point: ToolPointer) {
     const radius = this.context.getBrushSettings().size / 2;
+    const scale = this.context.viewport.getState().scale;
 
     this.cursorPreview.clear()
       .circle(point.x, point.y, radius)
-      .stroke({ color: 0xf5f7ff, alpha: 0.62, width: 1 / this.context.viewport.getState().scale });
+      .stroke({ color: 0x05070d, alpha: 0.82, width: 3 / scale })
+      .circle(point.x, point.y, radius)
+      .stroke({ color: 0xffffff, alpha: 0.9, width: 1.2 / scale });
   }
 }

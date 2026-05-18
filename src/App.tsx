@@ -5,6 +5,7 @@ import { AppFooter } from './components/AppFooter';
 import { CanvasControls } from './components/CanvasControls';
 import { StatusBar } from './components/StatusBar';
 import { TopToolbar } from './components/TopToolbar';
+import { HelpThemeControls } from './components/HelpThemeControls';
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
       <LeftToolbar />
       <RightSidebar />
       <CanvasControls />
+      <HelpThemeControls />
       <StatusBar />
       <AppFooter />
     </main>

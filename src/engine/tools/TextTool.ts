@@ -150,7 +150,12 @@ export class TextTool implements Tool {
     }
 
     this.context.history.capture();
-    const layer = this.context.text.hasTextObjects() ? activeLayer : this.context.layers.createEmptyLayer();
+    const shouldCreateTextLayer = !this.context.text.hasTextObjects() || activeLayer.hasPixels();
+    const layer = shouldCreateTextLayer ? this.context.layers.createEmptyLayer() : activeLayer;
+    if (layer !== activeLayer) {
+      useProjectStore.getState().setStatus('Created a text layer');
+      this.context.requestLayerSync();
+    }
     const textLocal = layer.worldToLocal(point);
     const object = this.context.text.create(layer, textLocal.x, textLocal.y, {
       ...this.context.getTextSettings(),

@@ -21,9 +21,23 @@ export class BrushTool implements Tool {
 
   private localStrokeStart: BrushPoint | null = null;
 
+  private strokeSnapshot: ImageData | null = null;
+
+  private isStraightStroke = false;
+
+  private lastLocalPoint: BrushPoint | null = null;
+
   constructor(protected readonly context: ToolContext) {
     this.cursorPreview.eventMode = 'none';
     this.context.overlay.addChild(this.cursorPreview);
+  }
+
+  onActivate() {
+    window.addEventListener('keydown', this.handleKeyDown);
+  }
+
+  onDeactivate() {
+    window.removeEventListener('keydown', this.handleKeyDown);
   }
 
   onPointerDown(point: ToolPointer) {
@@ -37,6 +51,9 @@ export class BrushTool implements Tool {
     this.isDrawing = true;
     const localPoint = layer.worldToLocal(point);
     this.localStrokeStart = localPoint;
+    this.lastLocalPoint = localPoint;
+    this.strokeSnapshot = layer.context.getImageData(0, 0, layer.canvas.width, layer.canvas.height);
+    this.isStraightStroke = false;
     this.stabilizer.reset(localPoint);
     this.brush.begin(layer.context, localPoint, this.context.getBrushSettings(), this.getCompositeMode(layer.alphaLocked));
     layer.markDirty();
@@ -52,14 +69,33 @@ export class BrushTool implements Tool {
     }
 
     const settings = this.context.getBrushSettings();
-    const localPoint = this.applyStraightConstraint(layer.worldToLocal(point), point.shiftKey);
-    const stabilized = this.stabilizer.add(localPoint, settings.stabilizer);
+    const localPoint = layer.worldToLocal(point);
+    this.lastLocalPoint = localPoint;
+
+    if (point.shiftKey && this.localStrokeStart && this.strokeSnapshot) {
+      this.renderStraightStroke(layer, localPoint);
+      return;
+    }
+
+    if (this.isStraightStroke) {
+      this.brush.end();
+      this.brush.begin(layer.context, localPoint, settings, this.getCompositeMode(layer.alphaLocked));
+      this.stabilizer.reset(localPoint);
+      this.isStraightStroke = false;
+      layer.markDirty();
+      return;
+    }
+
+    const stabilized = this.stabilizer.add(localPoint, settings.stabilizer, settings.size);
     this.brush.move(layer.context, stabilized, settings, this.getCompositeMode(layer.alphaLocked));
     layer.markDirty();
   }
 
   onPointerUp(point: ToolPointer) {
-    this.onPointerMove(point);
+    if (!this.isStraightStroke || point.shiftKey) {
+      this.onPointerMove(point);
+    }
+
     this.isDrawing = false;
     const layer = this.context.layers.getActiveLayer();
 
@@ -72,6 +108,9 @@ export class BrushTool implements Tool {
 
     this.stabilizer.reset();
     this.localStrokeStart = null;
+    this.lastLocalPoint = null;
+    this.strokeSnapshot = null;
+    this.isStraightStroke = false;
   }
 
   onCancel() {
@@ -79,24 +118,56 @@ export class BrushTool implements Tool {
     this.isDrawing = false;
     this.stabilizer.reset();
     this.localStrokeStart = null;
+    this.lastLocalPoint = null;
+    this.strokeSnapshot = null;
+    this.isStraightStroke = false;
     this.cursorPreview.clear();
   }
+
+  private handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key !== 'Shift' || !this.isDrawing || !this.lastLocalPoint) {
+      return;
+    }
+
+    const layer = this.context.layers.getActiveLayer();
+
+    if (layer && this.strokeSnapshot && this.localStrokeStart) {
+      this.renderStraightStroke(layer, this.lastLocalPoint);
+    }
+  };
 
   private getCompositeMode(alphaLocked: boolean): GlobalCompositeOperation {
     return alphaLocked && this.compositeMode === 'source-over' ? 'source-atop' : this.compositeMode;
   }
 
-  private applyStraightConstraint(point: BrushPoint, shiftKey: boolean): BrushPoint {
-    if (!shiftKey || !this.localStrokeStart) {
-      return point;
+  private renderStraightStroke(layer: ReturnType<ToolContext['layers']['getActiveLayer']>, endPoint: BrushPoint) {
+    if (!layer || !this.localStrokeStart || !this.strokeSnapshot) {
+      return;
     }
 
-    const dx = point.x - this.localStrokeStart.x;
-    const dy = point.y - this.localStrokeStart.y;
+    const settings = this.context.getBrushSettings();
+    const mode = this.getCompositeMode(layer.alphaLocked);
+    const ctx = layer.context;
 
-    return Math.abs(dx) > Math.abs(dy)
-      ? { ...point, y: this.localStrokeStart.y }
-      : { ...point, x: this.localStrokeStart.x };
+    ctx.putImageData(this.strokeSnapshot, 0, 0);
+    this.brush.end();
+
+    ctx.save();
+    ctx.globalCompositeOperation = mode;
+    ctx.globalAlpha = settings.opacity;
+    ctx.strokeStyle = settings.color;
+    ctx.lineWidth = Math.max(1, settings.size);
+    ctx.lineCap = settings.presetId === 'pixel' ? 'butt' : 'round';
+    ctx.lineJoin = settings.presetId === 'pixel' ? 'miter' : 'round';
+    ctx.imageSmoothingEnabled = settings.presetId !== 'pixel';
+    ctx.beginPath();
+    ctx.moveTo(this.localStrokeStart.x, this.localStrokeStart.y);
+    ctx.lineTo(endPoint.x, endPoint.y);
+    ctx.stroke();
+    ctx.restore();
+
+    this.isStraightStroke = true;
+    layer.markDirty();
   }
 
   protected drawCursor(point: ToolPointer) {
@@ -115,19 +186,21 @@ export class BrushTool implements Tool {
 
     if (settings.presetId === 'pixel') {
       const side = Math.max(1, Math.round(settings.size));
+      const x = Math.round(point.x - side / 2);
+      const y = Math.round(point.y - side / 2);
       this.cursorPreview
-        .rect(Math.round(point.x - side / 2), Math.round(point.y - side / 2), side, side)
-        .stroke({ color: 0xf5f7ff, alpha: 0.78, width: strokeWidth })
-        .rect(Math.round(point.x - side / 2) + strokeWidth, Math.round(point.y - side / 2) + strokeWidth, Math.max(1, side - strokeWidth * 2), Math.max(1, side - strokeWidth * 2))
-        .stroke({ color: 0x8f7cff, alpha: 0.45, width: strokeWidth });
+        .rect(x, y, side, side)
+        .stroke({ color: 0x05070d, alpha: 0.86, width: strokeWidth * 3 })
+        .rect(x, y, side, side)
+        .stroke({ color: 0xffffff, alpha: 0.92, width: strokeWidth * 1.2 });
       return;
     }
 
     this.cursorPreview
       .circle(point.x, point.y, radius)
-      .stroke({ color: 0xf5f7ff, alpha: 0.7, width: strokeWidth })
-      .circle(point.x, point.y, Math.max(1, radius - 1.5))
-      .stroke({ color: 0x8f7cff, alpha: 0.4, width: strokeWidth });
+      .stroke({ color: 0x05070d, alpha: 0.86, width: strokeWidth * 3 })
+      .circle(point.x, point.y, radius)
+      .stroke({ color: 0xffffff, alpha: 0.92, width: strokeWidth * 1.2 });
   }
 
   protected isInsideLayer(point: ToolPointer) {

@@ -61,8 +61,8 @@ export class MirrorBrushTool implements Tool {
     const settings = this.context.getBrushSettings();
     const localPoint = layer.worldToLocal(point);
     const mirroredPoint = this.mirrorLocalPoint(layer, localPoint);
-    const stabilized = this.stabilizer.add(localPoint, settings.stabilizer);
-    const mirroredStabilized = this.mirroredStabilizer.add(mirroredPoint, settings.stabilizer);
+    const stabilized = this.stabilizer.add(localPoint, settings.stabilizer, settings.size);
+    const mirroredStabilized = this.mirroredStabilizer.add(mirroredPoint, settings.stabilizer, settings.size);
 
     this.brush.move(layer.context, stabilized, settings, this.getCompositeMode(layer.alphaLocked));
     this.mirroredBrush.move(layer.context, mirroredStabilized, settings, this.getCompositeMode(layer.alphaLocked));
@@ -137,19 +137,31 @@ export class MirrorBrushTool implements Tool {
 
     if (settings.presetId === 'pixel') {
       const side = Math.max(1, Math.round(settings.size));
+      const x = Math.round(point.x - side / 2);
+      const y = Math.round(point.y - side / 2);
+      const mirroredX = Math.round(mirrored.x - side / 2);
+      const mirroredY = Math.round(mirrored.y - side / 2);
       this.cursorPreview
-        .rect(Math.round(point.x - side / 2), Math.round(point.y - side / 2), side, side)
-        .stroke({ color: 0xf5f7ff, alpha: 0.72, width: 1 / scale })
-        .rect(Math.round(mirrored.x - side / 2), Math.round(mirrored.y - side / 2), side, side)
-        .stroke({ color: 0x5ed7ff, alpha: 0.72, width: 1 / scale });
+        .rect(x, y, side, side)
+        .stroke({ color: 0x05070d, alpha: 0.86, width: 3 / scale })
+        .rect(x, y, side, side)
+        .stroke({ color: 0xffffff, alpha: 0.92, width: 1.2 / scale })
+        .rect(mirroredX, mirroredY, side, side)
+        .stroke({ color: 0x05070d, alpha: 0.72, width: 3 / scale })
+        .rect(mirroredX, mirroredY, side, side)
+        .stroke({ color: 0x5ed7ff, alpha: 0.92, width: 1.2 / scale });
       return;
     }
 
     this.cursorPreview
       .circle(point.x, point.y, radius)
-      .stroke({ color: 0xf5f7ff, alpha: 0.72, width: 1 / scale })
+      .stroke({ color: 0x05070d, alpha: 0.86, width: 3 / scale })
+      .circle(point.x, point.y, radius)
+      .stroke({ color: 0xffffff, alpha: 0.92, width: 1.2 / scale })
       .circle(mirrored.x, mirrored.y, radius)
-      .stroke({ color: 0x5ed7ff, alpha: 0.72, width: 1 / scale });
+      .stroke({ color: 0x05070d, alpha: 0.72, width: 3 / scale })
+      .circle(mirrored.x, mirrored.y, radius)
+      .stroke({ color: 0x5ed7ff, alpha: 0.92, width: 1.2 / scale });
   }
 
   private isInsideLayer(point: ToolPointer, layer: Layer) {

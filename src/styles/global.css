@@ -42,6 +42,203 @@ button {
     linear-gradient(135deg, #07080c 0%, #101219 48%, #090a10 100%);
 }
 
+:root[data-theme="light"] .app-shell {
+  background:
+    radial-gradient(circle at 28% 18%, rgb(143 124 255 / 0.12), transparent 34%),
+    linear-gradient(135deg, #eef1f7 0%, #f8f9fc 52%, #e7ebf3 100%);
+}
+
+:root[data-theme="light"] .left-toolbar,
+:root[data-theme="light"] .top-toolbar,
+:root[data-theme="light"] .canvas-controls,
+:root[data-theme="light"] .app-footer,
+:root[data-theme="light"] .status-bar,
+:root[data-theme="light"] .help-theme-controls {
+  color: #202637;
+  border-color: rgb(25 31 48 / 0.12);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.86), rgb(237 240 248 / 0.76)),
+    rgb(255 255 255 / 0.72);
+  box-shadow:
+    0 18px 48px rgb(38 45 70 / 0.15),
+    inset 0 1px 0 rgb(255 255 255 / 0.72);
+}
+
+:root[data-theme="light"] .sidebar-window,
+:root[data-theme="light"] .new-project-modal,
+:root[data-theme="light"] .hotkeys-modal {
+  color: #202637;
+  border-color: rgb(25 31 48 / 0.12);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.92), rgb(238 242 250 / 0.88)),
+    rgb(255 255 255 / 0.82);
+  box-shadow:
+    0 20px 54px rgb(38 45 70 / 0.18),
+    inset 0 1px 0 rgb(255 255 255 / 0.74);
+}
+
+:root[data-theme="light"] .panel-header strong,
+:root[data-theme="light"] .section-title,
+:root[data-theme="light"] .top-toolbar-label,
+:root[data-theme="light"] .layer-item.is-active {
+  color: #1b2131;
+}
+
+:root[data-theme="light"] .panel-header,
+:root[data-theme="light"] .top-field,
+:root[data-theme="light"] .brush-preset-dropdown,
+:root[data-theme="light"] .top-mini-slider,
+:root[data-theme="light"] .control-row,
+:root[data-theme="light"] .layer-meta,
+:root[data-theme="light"] .status-bar,
+:root[data-theme="light"] .app-footer {
+  color: #354055;
+}
+
+:root[data-theme="light"] .top-toolbar output,
+:root[data-theme="light"] .control-row output,
+:root[data-theme="light"] .top-mini-slider output,
+:root[data-theme="light"] .color-preview-row input,
+:root[data-theme="light"] .layer-name-input,
+:root[data-theme="light"] .size-scrub-label {
+  color: #1f2738;
+}
+
+:root[data-theme="light"] .tool-button,
+:root[data-theme="light"] .top-toolbar button,
+:root[data-theme="light"] .project-actions button,
+:root[data-theme="light"] .layer-actions button,
+:root[data-theme="light"] .layer-controls span,
+:root[data-theme="light"] .canvas-controls button,
+:root[data-theme="light"] .help-theme-controls button {
+  color: #516078;
+  border-color: rgb(55 67 92 / 0.14);
+  background: rgb(255 255 255 / 0.62);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.7),
+    0 8px 20px rgb(54 65 92 / 0.08);
+}
+
+:root[data-theme="light"] .tool-button:hover,
+:root[data-theme="light"] .top-toolbar button:hover,
+:root[data-theme="light"] .project-actions button:hover,
+:root[data-theme="light"] .layer-actions button:hover,
+:root[data-theme="light"] .layer-controls span:hover,
+:root[data-theme="light"] .canvas-controls button:hover,
+:root[data-theme="light"] .help-theme-controls button:hover {
+  color: #111827;
+  border-color: rgb(113 95 255 / 0.42);
+  background: rgb(143 124 255 / 0.16);
+}
+
+:root[data-theme="light"] .tool-button.is-active,
+:root[data-theme="light"] .layer-item.is-active {
+  color: #161b2a;
+  background: rgb(143 124 255 / 0.18);
+  outline-color: rgb(113 95 255 / 0.56);
+}
+
+:root[data-theme="light"] .brush-preset-trigger,
+:root[data-theme="light"] .font-picker-trigger,
+:root[data-theme="light"] .text-size-control,
+:root[data-theme="light"] .text-color-button,
+:root[data-theme="light"] .color-preview-row input,
+:root[data-theme="light"] .layer-item,
+:root[data-theme="light"] .toggle-grid label,
+:root[data-theme="light"] .segmented-grid button,
+:root[data-theme="light"] .gradient-quick-controls button,
+:root[data-theme="light"] .gradient-quick-controls label,
+:root[data-theme="light"] .gradient-endpoints label {
+  color: #243047;
+  border-color: rgb(55 67 92 / 0.13);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.78), rgb(238 242 249 / 0.62)),
+    rgb(255 255 255 / 0.6);
+}
+
+:root[data-theme="light"] .project-actions .save-project-action,
+:root[data-theme="light"] .project-actions .export-png-action {
+  color: #102032;
+  border-color: rgb(33 150 205 / 0.45);
+  background:
+    linear-gradient(180deg, rgb(94 215 255 / 0.48), rgb(143 124 255 / 0.22)),
+    rgb(255 255 255 / 0.74);
+}
+
+:root[data-theme="light"] .color-preview,
+:root[data-theme="light"] .recent-colors button,
+:root[data-theme="light"] .layer-preview {
+  border-color: rgb(35 44 63 / 0.22);
+}
+
+:root[data-theme="light"] input[type="range"] {
+  accent-color: #715fff;
+}
+
+:root[data-theme="light"] .hotkey-row,
+:root[data-theme="light"] .hotkey-row kbd {
+  color: #20283a;
+}
+
+:root[data-theme="light"] .modal-backdrop {
+  background: rgb(35 42 58 / 0.42);
+}
+
+:root[data-theme="light"] .modal-header {
+  color: #172033;
+}
+
+:root[data-theme="light"] .modal-header strong {
+  color: #5f6d85;
+}
+
+:root[data-theme="light"] .preset-grid button,
+:root[data-theme="light"] .modal-actions button {
+  color: #334057;
+  border-color: rgb(55 67 92 / 0.14);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.78), rgb(235 240 249 / 0.68)),
+    rgb(255 255 255 / 0.68);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.72),
+    0 8px 18px rgb(54 65 92 / 0.08);
+}
+
+:root[data-theme="light"] .preset-grid button:hover,
+:root[data-theme="light"] .modal-actions button:hover,
+:root[data-theme="light"] .preset-grid button.is-active {
+  color: #172033;
+  border-color: rgb(113 95 255 / 0.5);
+  background: rgb(143 124 255 / 0.16);
+}
+
+:root[data-theme="light"] .section-title button {
+  color: #243047;
+  border-color: rgb(113 95 255 / 0.24);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.9), rgb(235 240 249 / 0.75)),
+    rgb(143 124 255 / 0.08);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.72),
+    0 8px 18px rgb(54 65 92 / 0.1);
+}
+
+:root[data-theme="light"] .section-title button:hover {
+  color: #111827;
+  border-color: rgb(113 95 255 / 0.58);
+  background: rgb(143 124 255 / 0.18);
+}
+
+:root[data-theme="light"] .size-inputs label {
+  color: #4b5a72;
+}
+
+:root[data-theme="light"] .size-inputs input {
+  color: #172033;
+  border-color: rgb(55 67 92 / 0.14);
+  background: rgb(255 255 255 / 0.7);
+}
+
 .canvas-host {
   position: absolute;
   inset: 0;
@@ -74,7 +271,8 @@ button {
 .top-toolbar,
 .canvas-controls,
 .right-sidebar,
-.app-footer {
+.app-footer,
+.help-theme-controls {
   position: fixed;
   z-index: 5;
   border: 1px solid rgb(255 255 255 / 0.1);
@@ -94,6 +292,7 @@ button {
   grid-template-columns: auto 30px minmax(150px, 220px) 48px 30px;
   gap: 9px;
   align-items: center;
+  max-width: calc(100vw - 424px);
   padding: 9px 10px;
   border-radius: 14px;
 }
@@ -105,8 +304,8 @@ button {
 }
 
 .top-toolbar-brush {
-  grid-template-columns: auto 198px minmax(150px, 210px) minmax(150px, 190px);
-  gap: 12px;
+  grid-template-columns: auto minmax(154px, 188px) repeat(3, minmax(112px, 1fr));
+  gap: 10px;
 }
 
 .top-toolbar-text {
@@ -251,8 +450,7 @@ button {
 .text-size-control input {
   width: 54px;
   height: 28px;
-  border: 1px solid rgb(255 255 255 / 0.08);
-  border-width: 0 1px;
+  border: 0;
   border-radius: 0;
   color: #eef2ff;
   background: transparent;
@@ -321,7 +519,7 @@ button {
 .brush-preset-dropdown {
   position: relative;
   display: grid;
-  grid-template-columns: auto 150px;
+  grid-template-columns: auto minmax(112px, 1fr);
   gap: 8px;
   align-items: center;
   color: #aeb6c9;
@@ -402,8 +600,8 @@ button {
 
 .top-mini-slider {
   display: grid;
-  grid-template-columns: auto minmax(72px, 1fr) 42px;
-  gap: 7px;
+  grid-template-columns: auto minmax(46px, 1fr) minmax(34px, auto);
+  gap: 6px;
   align-items: center;
   color: #aeb6c9;
   font-size: 12px;
@@ -655,7 +853,7 @@ button {
 .top-toolbar-text .top-icon-group button {
   width: 28px;
   height: 28px;
-  border-radius: 9px;
+  border-radius: 8px;
 }
 
 .top-toolbar-text .text-size-control button {
@@ -673,20 +871,40 @@ button {
 }
 
 .top-toolbar-text .text-size-control {
-  border-color: rgb(255 255 255 / 0.09);
+  border-color: transparent;
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.07),
+    inset 0 1px 0 rgb(255 255 255 / 0.045),
     0 8px 20px rgb(0 0 0 / 0.18);
 }
 
 .top-toolbar-text .top-icon-group {
   gap: 5px;
-  padding: 3px;
-  border: 1px solid rgb(255 255 255 / 0.075);
-  border-radius: 12px;
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.02)),
-    rgb(255 255 255 / 0.032);
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+}
+
+.top-toolbar-text .top-icon-group button {
+  border: 0 !important;
+  outline: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.top-toolbar-text .top-icon-group button:hover {
+  background: rgb(255 255 255 / 0.07) !important;
+  box-shadow: none !important;
+}
+
+.top-toolbar-text .top-icon-group[aria-label="Text style"] button.is-active {
+  color: #ffffff;
+  background: rgb(255 122 196 / 0.24) !important;
+}
+
+.top-toolbar-text .top-icon-group[aria-label="Text alignment"] button.is-active {
+  color: #ffffff;
+  background: rgb(94 215 255 / 0.2) !important;
 }
 
 .top-toolbar input {
@@ -728,7 +946,7 @@ button {
   place-items: stretch;
   align-items: center;
   justify-content: start;
-  width: 150px;
+  width: 100%;
   height: 34px;
   padding: 0 28px 0 8px;
   overflow: hidden;
@@ -1016,7 +1234,7 @@ button {
 .right-sidebar {
   top: 24px;
   right: 24px;
-  width: min(280px, calc(100vw - 112px));
+  width: clamp(232px, 22vw, 280px);
   max-height: calc(100vh - 96px);
   display: grid;
   grid-template-rows: auto minmax(210px, 0.9fr) minmax(150px, 0.7fr);
@@ -1101,6 +1319,39 @@ button {
   border-radius: 10px;
 }
 
+.project-actions button:nth-child(1) {
+  border-color: rgb(143 124 255 / 0.3);
+  background: rgb(143 124 255 / 0.11);
+}
+
+.project-actions button:nth-child(3) {
+  border-color: rgb(108 132 255 / 0.28);
+  background: rgb(108 132 255 / 0.1);
+}
+
+.project-actions button:nth-child(4) {
+  border-color: rgb(255 188 91 / 0.28);
+  background: rgb(255 188 91 / 0.1);
+}
+
+.project-actions .save-project-action {
+  color: #ffffff;
+  border-color: rgb(94 215 255 / 0.44);
+  background:
+    linear-gradient(180deg, rgb(94 215 255 / 0.28), rgb(143 124 255 / 0.18)),
+    rgb(94 215 255 / 0.12);
+  box-shadow:
+    0 10px 26px rgb(94 215 255 / 0.15),
+    inset 0 1px 0 rgb(255 255 255 / 0.12);
+}
+
+.project-actions .save-project-action:hover {
+  border-color: rgb(94 215 255 / 0.72);
+  background:
+    linear-gradient(180deg, rgb(94 215 255 / 0.36), rgb(143 124 255 / 0.23)),
+    rgb(94 215 255 / 0.16);
+}
+
 .project-actions .export-png-action {
   color: #ffffff;
   border-color: rgb(94 215 255 / 0.48);
@@ -1117,6 +1368,21 @@ button {
   background:
     linear-gradient(145deg, rgb(94 215 255 / 0.32), rgb(143 124 255 / 0.22)),
     rgb(255 255 255 / 0.07);
+}
+
+.project-actions button:nth-child(6) {
+  border-color: rgb(92 255 183 / 0.24);
+  background: rgb(92 255 183 / 0.09);
+}
+
+.project-actions button:nth-child(7) {
+  border-color: rgb(255 122 196 / 0.24);
+  background: rgb(255 122 196 / 0.09);
+}
+
+.project-actions button:nth-child(8) {
+  border-color: rgb(255 142 94 / 0.24);
+  background: rgb(255 142 94 / 0.09);
 }
 
 .project-actions button:hover,
@@ -1749,6 +2015,70 @@ button {
     transform 160ms ease;
 }
 
+.help-theme-controls {
+  right: 24px;
+  bottom: 24px;
+  display: grid;
+  grid-template-columns: repeat(2, 34px);
+  gap: 8px;
+  padding: 8px;
+  border-radius: 14px;
+}
+
+.help-theme-controls button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: 10px;
+  color: #dce3f6;
+  background: rgb(255 255 255 / 0.045);
+  cursor: pointer;
+}
+
+.help-theme-controls button:hover {
+  color: #fff;
+  border-color: rgb(143 124 255 / 0.52);
+  background: rgb(143 124 255 / 0.15);
+}
+
+.hotkeys-modal {
+  width: min(420px, calc(100vw - 40px));
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 18px;
+  padding: 16px;
+  background:
+    linear-gradient(180deg, rgb(24 27 38 / 0.94), rgb(12 14 20 / 0.92)),
+    rgb(17 19 27 / 0.92);
+  box-shadow: 0 28px 90px rgb(0 0 0 / 0.55);
+}
+
+.hotkeys-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.hotkey-row {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-height: 32px;
+  color: #cbd3e6;
+  font-size: 12px;
+}
+
+.hotkey-row kbd {
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 8px;
+  padding: 6px 8px;
+  color: #f5f7ff;
+  background: rgb(255 255 255 / 0.055);
+  font: 700 11px/1 Inter, ui-sans-serif, system-ui;
+}
+
 .canvas-controls button:hover {
   color: #fff;
   border-color: rgb(143 124 255 / 0.52);
@@ -1790,16 +2120,61 @@ button {
   text-transform: capitalize;
 }
 
+@media (max-width: 1100px) {
+  .top-toolbar {
+    left: 88px;
+    max-width: calc(100vw - 336px);
+    padding: 8px;
+  }
+
+  .top-toolbar-brush {
+    grid-template-columns: auto minmax(138px, 160px) repeat(3, minmax(96px, 1fr));
+    gap: 8px;
+  }
+
+  .top-mini-slider {
+    grid-template-columns: auto minmax(38px, 1fr) minmax(30px, auto);
+    gap: 5px;
+    font-size: 11px;
+  }
+
+  .top-mini-slider output {
+    font-size: 11px;
+  }
+
+  .right-sidebar {
+    right: 14px;
+    width: 220px;
+  }
+
+  .project-actions {
+    gap: 6px;
+  }
+}
+
 @media (max-width: 760px) {
   .left-toolbar {
     top: 16px;
     left: 16px;
   }
 
+  .top-toolbar {
+    left: 84px;
+    max-width: calc(100vw - 104px);
+  }
+
+  .top-toolbar-brush {
+    grid-template-columns: auto minmax(122px, 1fr);
+  }
+
+  .top-toolbar-brush .top-mini-slider {
+    grid-column: span 2;
+  }
+
   .right-sidebar {
     top: 16px;
     right: 16px;
-    padding: 14px;
+    width: min(240px, calc(100vw - 104px));
   }
 
   .app-footer {
@@ -1810,4 +2185,44 @@ button {
   .canvas-controls {
     bottom: 62px;
   }
+}
+
+.top-toolbar.top-toolbar-text .top-icon-group,
+.top-toolbar.top-toolbar-text .top-icon-group button,
+.top-toolbar.top-toolbar-text .top-icon-group button:hover,
+.top-toolbar.top-toolbar-text .top-icon-group button.is-active,
+.top-toolbar.top-toolbar-text .text-size-control button,
+.top-toolbar.top-toolbar-text .text-size-control button:hover,
+.top-toolbar.top-toolbar-text .text-size-control button.is-active {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+.top-toolbar.top-toolbar-text .top-icon-group {
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.top-toolbar.top-toolbar-text .top-icon-group button {
+  background: transparent !important;
+}
+
+.top-toolbar.top-toolbar-text .top-icon-group button:hover,
+.top-toolbar.top-toolbar-text .text-size-control button:hover {
+  background: rgb(255 255 255 / 0.065) !important;
+}
+
+.top-toolbar.top-toolbar-text .top-icon-group[aria-label="Text style"] button.is-active {
+  background: rgb(255 122 196 / 0.24) !important;
+}
+
+.top-toolbar.top-toolbar-text .top-icon-group[aria-label="Text alignment"] button.is-active {
+  background: rgb(94 215 255 / 0.2) !important;
+}
+
+.top-toolbar.top-toolbar-text .text-size-control,
+.top-toolbar.top-toolbar-text .text-size-control input {
+  border: 0 !important;
+  box-shadow: none !important;
 }

@@ -5,6 +5,7 @@ export type LumitraActions = {
   createLayer: () => Promise<void>;
   duplicateLayer: () => Promise<void>;
   clearLayer: () => Promise<void>;
+  deleteLayer: (id: string) => Promise<void>;
   moveLayer: (id: string, direction: 'up' | 'down') => Promise<void>;
   saveProject: () => Promise<void>;
   openProject: () => Promise<void>;

@@ -10,11 +10,11 @@ import {
   ImageDown,
   ImagePlus,
   Lock,
-  LockKeyhole,
   Plus,
   Redo2,
   RotateCcw,
   Save,
+  SquareDashedBottom,
   Trash2,
   Type,
   Undo2,
@@ -128,6 +128,7 @@ export function RightSidebar() {
           </button>
           <button
             type="button"
+            className="save-project-action"
             title="Save project"
             aria-label="Save project"
             onClick={() => {
@@ -435,7 +436,7 @@ export function RightSidebar() {
                     }
                   }}
                 >
-                  <LockKeyhole size={14} opacity={layer.alphaLocked ? 1 : 0.45} />
+                  <SquareDashedBottom size={14} opacity={layer.alphaLocked ? 1 : 0.5} />
                 </span>
                 <span
                   role="button"
@@ -461,13 +462,17 @@ export function RightSidebar() {
                   title="Delete layer"
                   onClick={(event) => {
                     event.stopPropagation();
-                    deleteLayer(layer.id);
+                    if (window.confirm('Сохрани проект перед удалением слоя. Удалить слой?')) {
+                      void (window.lumitraActions?.deleteLayer(layer.id) ?? Promise.resolve(deleteLayer(layer.id)));
+                    }
                   }}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
                       event.stopPropagation();
-                      deleteLayer(layer.id);
+                      if (window.confirm('Сохрани проект перед удалением слоя. Удалить слой?')) {
+                        void (window.lumitraActions?.deleteLayer(layer.id) ?? Promise.resolve(deleteLayer(layer.id)));
+                      }
                     }
                   }}
                 >
