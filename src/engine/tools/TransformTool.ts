@@ -1,4 +1,5 @@
 import { Graphics, Sprite, Texture } from 'pixi.js';
+import { useProjectStore } from '../../app/projectStore';
 import { Layer } from '../layers/Layer';
 import { Tool, ToolContext, ToolPointer } from './Tool';
 
@@ -76,6 +77,8 @@ export class TransformTool implements Tool {
 
   onActivate() {
     window.addEventListener('keydown', this.onKeyDown);
+    window.addEventListener('lumitra-transform-apply', this.onExternalApply);
+    window.addEventListener('lumitra-transform-cancel', this.onExternalCancel);
     this.setCursor('crosshair');
     this.draw();
   }
@@ -83,6 +86,8 @@ export class TransformTool implements Tool {
   onDeactivate() {
     this.cancel();
     window.removeEventListener('keydown', this.onKeyDown);
+    window.removeEventListener('lumitra-transform-apply', this.onExternalApply);
+    window.removeEventListener('lumitra-transform-cancel', this.onExternalCancel);
     this.setCursor('');
   }
 
@@ -227,6 +232,7 @@ export class TransformTool implements Tool {
     const center = this.localToWorld(layer, localRect.x + localRect.width / 2, localRect.y + localRect.height / 2);
     this.transform = { x: center.x, y: center.y, scaleX: 1, scaleY: 1, rotation: layer.transform.rotation };
     this.createPreviewSprite();
+    this.emitTransformState(true);
     this.draw();
   }
 
@@ -275,6 +281,7 @@ export class TransformTool implements Tool {
       layer.context.restore();
       layer.markDirtyNow();
       this.context.requestLayerSync();
+      useProjectStore.getState().markDirty();
     }
 
     this.clearState();
@@ -301,6 +308,7 @@ export class TransformTool implements Tool {
     this.originalPixels = null;
     this.previewCanvas = null;
     this.destroyPreview();
+    this.emitTransformState(false);
     this.draw();
   }
 
@@ -454,6 +462,18 @@ export class TransformTool implements Tool {
       this.apply();
     }
   };
+
+  private onExternalApply = () => {
+    this.apply();
+  };
+
+  private onExternalCancel = () => {
+    this.cancel();
+  };
+
+  private emitTransformState(active: boolean) {
+    window.dispatchEvent(new CustomEvent('lumitra-transform-state', { detail: active }));
+  }
 
   private cursorForHit(hit: Hit) {
     if (hit === 'inside') return 'move';

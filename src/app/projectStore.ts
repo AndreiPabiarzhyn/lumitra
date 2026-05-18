@@ -12,6 +12,8 @@ type ProjectAction =
 type ProjectState = {
   pendingAction: ProjectAction | null;
   status: string;
+  isDirty: boolean;
+  lastSavedAt: string | null;
   requestSave: () => void;
   requestOpen: () => void;
   requestImportImage: () => void;
@@ -20,12 +22,16 @@ type ProjectState = {
   requestUndo: () => void;
   requestRedo: () => void;
   setStatus: (status: string) => void;
+  markDirty: () => void;
+  markSaved: () => void;
   consumeAction: () => ProjectAction | null;
 };
 
 export const useProjectStore = create<ProjectState>((set, get) => ({
   pendingAction: null,
   status: 'Ready',
+  isDirty: false,
+  lastSavedAt: null,
   requestSave: () => set({ pendingAction: { type: 'save' }, status: 'Saving project' }),
   requestOpen: () => set({ pendingAction: { type: 'open' }, status: 'Opening project' }),
   requestImportImage: () => set({ pendingAction: { type: 'import-image' }, status: 'Importing image' }),
@@ -34,6 +40,15 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   requestUndo: () => set({ pendingAction: { type: 'undo' }, status: 'Undo' }),
   requestRedo: () => set({ pendingAction: { type: 'redo' }, status: 'Redo' }),
   setStatus: (status) => set({ status }),
+  markDirty: () => set({ isDirty: true }),
+  markSaved: () => {
+    const now = new Date();
+    set({
+      isDirty: false,
+      lastSavedAt: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      status: 'Project saved',
+    });
+  },
   consumeAction: () => {
     const action = get().pendingAction;
     set({ pendingAction: null });

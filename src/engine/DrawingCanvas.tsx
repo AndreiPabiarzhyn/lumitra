@@ -7,6 +7,7 @@ import { useLayerStore } from '../app/layerStore';
 import { useProjectStore } from '../app/projectStore';
 import { useSmudgeStore } from '../app/smudgeStore';
 import { useTextStore } from '../app/textStore';
+import { useToastStore } from '../app/toastStore';
 import { useToolStore } from '../app/toolStore';
 import { useViewportStore } from '../app/viewportStore';
 import { HistoryManager } from './history/HistoryManager';
@@ -181,6 +182,40 @@ export function DrawingCanvas() {
       );
     };
 
+    const notify = (message: string, tone: 'info' | 'success' | 'warning' = 'info') => {
+      useProjectStore.getState().setStatus(message);
+      useToastStore.getState().pushToast(message, tone);
+    };
+
+    let autosaveDebounce: number | null = null;
+
+    const autosaveNow = async () => {
+      const project = createProject();
+
+      if (project) {
+        await saveAutosave(project);
+      }
+    };
+
+    const scheduleAutosave = () => {
+      if (autosaveDebounce !== null) {
+        window.clearTimeout(autosaveDebounce);
+      }
+
+      autosaveDebounce = window.setTimeout(() => {
+        autosaveDebounce = null;
+        void autosaveNow();
+      }, 900);
+    };
+
+    const markDirty = (message?: string) => {
+      useProjectStore.getState().markDirty();
+      scheduleAutosave();
+      if (message) {
+        notify(message);
+      }
+    };
+
     const restoreProject = async (project: LumitraProject) => {
       const manager = layerManagerRef.current;
       const renderer = layerRendererRef.current;
@@ -238,7 +273,8 @@ export function DrawingCanvas() {
       history.clear();
       history.capture();
       syncLayerStoreFromManager();
-      useProjectStore.getState().setStatus(`New project ${width}x${height}`);
+      useProjectStore.getState().markSaved();
+      notify(`New project ${width}x${height}`, 'success');
     };
 
     const centerCanvas = async () => {
@@ -251,7 +287,7 @@ export function DrawingCanvas() {
 
       const size = manager.getSize();
       viewport.setState(getCenteredViewport(size.width, size.height));
-      useProjectStore.getState().setStatus('Canvas centered');
+      notify('Canvas centered');
     };
 
     const zoomCanvas = async (direction: 'in' | 'out') => {
@@ -266,7 +302,7 @@ export function DrawingCanvas() {
         ...state,
         scale: state.scale * (direction === 'in' ? 1.12 : 0.88),
       });
-      useProjectStore.getState().setStatus(`Zoom ${Math.round(viewport.getState().scale * 100)}%`);
+      notify(`Zoom ${Math.round(viewport.getState().scale * 100)}%`);
     };
 
     const createLayer = async () => {
@@ -280,7 +316,7 @@ export function DrawingCanvas() {
       manager.createEmptyLayer();
       layerRendererRef.current?.sync(manager.getLayers());
       syncLayerStoreFromManager();
-      useProjectStore.getState().setStatus('Layer created');
+      markDirty('Layer created');
     };
 
     const duplicateLayer = async () => {
@@ -293,13 +329,13 @@ export function DrawingCanvas() {
       historyRef.current?.capture();
       const layer = manager.duplicateActiveLayer();
       if (!layer) {
-        useProjectStore.getState().setStatus('No active layer');
+        notify('No active layer', 'warning');
         return;
       }
 
       layerRendererRef.current?.sync(manager.getLayers());
       syncLayerStoreFromManager();
-      useProjectStore.getState().setStatus('Layer duplicated');
+      markDirty('Layer duplicated');
     };
 
     const clearLayer = async () => {
@@ -316,9 +352,9 @@ export function DrawingCanvas() {
           textManagerRef.current?.clearLayer(activeLayer.id);
         }
         syncLayerStoreFromManager();
-        useProjectStore.getState().setStatus('Layer cleared');
+        markDirty('Layer cleared');
       } else {
-        useProjectStore.getState().setStatus('Active layer locked');
+        notify('Active layer locked', 'warning');
       }
     };
 
@@ -334,9 +370,9 @@ export function DrawingCanvas() {
         textManagerRef.current?.clearLayer(id);
         layerRendererRef.current?.sync(manager.getLayers());
         syncLayerStoreFromManager();
-        useProjectStore.getState().setStatus('Layer deleted');
+        markDirty('Layer deleted');
       } else {
-        useProjectStore.getState().setStatus('Cannot delete last layer');
+        notify('Cannot delete last layer', 'warning');
       }
     };
 
@@ -351,9 +387,9 @@ export function DrawingCanvas() {
       if (manager.moveLayer(id, direction)) {
         layerRendererRef.current?.sync(manager.getLayers());
         syncLayerStoreFromManager();
-        useProjectStore.getState().setStatus(direction === 'up' ? 'Layer moved up' : 'Layer moved down');
+        markDirty(direction === 'up' ? 'Layer moved up' : 'Layer moved down');
       } else {
-        useProjectStore.getState().setStatus('Layer already at edge');
+        notify('Layer already at edge', 'warning');
       }
     };
 
@@ -371,7 +407,8 @@ export function DrawingCanvas() {
           accept: { 'application/json': ['.lumitra'] },
         },
       ]);
-      useProjectStore.getState().setStatus('Project saved');
+      useProjectStore.getState().markSaved();
+      notify('Project saved', 'success');
       await saveAutosave(project);
     };
 
@@ -383,7 +420,8 @@ export function DrawingCanvas() {
       }
 
       await restoreProject(JSON.parse(await readFileAsText(file)) as LumitraProject);
-      useProjectStore.getState().setStatus('Project opened');
+      useProjectStore.getState().markSaved();
+      notify('Project opened', 'success');
     };
 
     const importImage = async () => {
@@ -401,7 +439,7 @@ export function DrawingCanvas() {
       await layer.drawImageFile(file);
       layerRendererRef.current?.sync(manager.getLayers());
       syncLayerStoreFromManager();
-      useProjectStore.getState().setStatus('Image imported');
+      markDirty('Image imported on new layer');
     };
 
     const restoreHistory = async (direction: 'undo' | 'redo') => {
@@ -416,9 +454,9 @@ export function DrawingCanvas() {
       if (changed) {
         layerRendererRef.current?.sync(layerManagerRef.current?.getLayers() ?? []);
         syncLayerStoreFromManager();
-        useProjectStore.getState().setStatus(direction === 'undo' ? 'Undo applied' : 'Redo applied');
+        markDirty(direction === 'undo' ? 'Undo applied' : 'Redo applied');
       } else {
-        useProjectStore.getState().setStatus(direction === 'undo' ? 'Nothing to undo' : 'Nothing to redo');
+        notify(direction === 'undo' ? 'Nothing to undo' : 'Nothing to redo', 'warning');
       }
     };
 
@@ -451,7 +489,8 @@ export function DrawingCanvas() {
       const layer = manager.createEmptyLayer();
       layerRendererRef.current?.sync(manager.getLayers());
       syncLayerStoreFromManager();
-      useProjectStore.getState().setStatus(`Created ${layer.name} for drawing`);
+      markDirty(`Text layer protected. Created ${layer.name} for drawing`);
+      useToastStore.getState().pushToast('Text layers are protected from drawing', 'warning');
     };
 
     const exportPng = async () => {
@@ -464,7 +503,7 @@ export function DrawingCanvas() {
       const blob = await service.exportPngBlob(2);
 
       if (!blob) {
-        useProjectStore.getState().setStatus('Nothing to export');
+        notify('Nothing to export', 'warning');
         return;
       }
 
@@ -474,7 +513,7 @@ export function DrawingCanvas() {
           accept: { 'image/png': ['.png'] },
         },
       ]);
-      useProjectStore.getState().setStatus('PNG exported');
+      notify('PNG exported', 'success');
     };
 
     const handleProjectAction = () => {
@@ -508,9 +547,9 @@ export function DrawingCanvas() {
         void loadAutosave().then((project) => {
           if (project) {
             void restoreProject(project);
-            useProjectStore.getState().setStatus('Autosave restored');
+            notify('Autosave restored', 'success');
           } else {
-            useProjectStore.getState().setStatus('No autosave found');
+            notify('No autosave found', 'warning');
           }
         });
       }
@@ -566,6 +605,10 @@ export function DrawingCanvas() {
       toolManagerRef.current?.pointerUp(toToolPointer(event, app.canvas, viewport));
       app.canvas.releasePointerCapture(event.pointerId);
       toolManagerRef.current?.restorePreviousTool();
+      if (!['hand', 'move'].includes(useToolStore.getState().activeTool)) {
+        useProjectStore.getState().markDirty();
+        scheduleAutosave();
+      }
     };
 
     const wheel = (event: WheelEvent) => {
@@ -630,6 +673,10 @@ export function DrawingCanvas() {
     };
 
     const beforeUnload = (event: BeforeUnloadEvent) => {
+      if (!useProjectStore.getState().isDirty) {
+        return;
+      }
+
       event.preventDefault();
       event.returnValue = 'Сохрани проект перед закрытием.';
     };
@@ -674,6 +721,19 @@ export function DrawingCanvas() {
       syncLayerStoreFromManager();
       history.capture();
 
+      void loadAutosave().then((project) => {
+        if (!project || destroyed) {
+          return;
+        }
+
+        void restoreProject(project).then(() => {
+          useProjectStore.getState().markSaved();
+          notify('Cached project restored', 'success');
+        });
+      }).catch(() => {
+        notify('Autosave cache unavailable', 'warning');
+      });
+
       toolManagerRef.current = new ToolManager({
         app,
         overlay: renderer.overlay,
@@ -706,10 +766,7 @@ export function DrawingCanvas() {
       window.addEventListener('beforeunload', beforeUnload);
       const unsubscribeProject = useProjectStore.subscribe(handleProjectAction);
       const autosaveTimer = window.setInterval(() => {
-        const project = createProject();
-        if (project) {
-          void saveAutosave(project);
-        }
+        void autosaveNow();
       }, 60000);
 
       window.lumitraActions = {
@@ -729,9 +786,9 @@ export function DrawingCanvas() {
           const project = await loadAutosave();
           if (project) {
             await restoreProject(project);
-            useProjectStore.getState().setStatus('Autosave restored');
+            notify('Autosave restored', 'success');
           } else {
-            useProjectStore.getState().setStatus('No autosave found');
+            notify('No autosave found', 'warning');
           }
         },
         undo: async () => restoreHistory('undo'),
@@ -741,6 +798,9 @@ export function DrawingCanvas() {
       cleanupRuntime = () => {
         unsubscribeProject();
         window.clearInterval(autosaveTimer);
+        if (autosaveDebounce !== null) {
+          window.clearTimeout(autosaveDebounce);
+        }
         app.canvas.removeEventListener('pointerdown', pointerDown);
         app.canvas.removeEventListener('pointermove', pointerMove);
         app.canvas.removeEventListener('pointerup', pointerUp);

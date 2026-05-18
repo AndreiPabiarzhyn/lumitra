@@ -120,15 +120,7 @@ export function RightSidebar() {
           <strong>Studio</strong>
         </div>
 
-        <div className="project-actions">
-          <button
-            type="button"
-            title="New project"
-            aria-label="New project"
-            onClick={() => setIsNewProjectOpen(true)}
-          >
-            <FilePlus2 size={16} />
-          </button>
+        <div className="primary-save-actions">
           <button
             type="button"
             className="save-project-action"
@@ -139,6 +131,30 @@ export function RightSidebar() {
             }}
           >
             <Save size={16} />
+            <span>Save Project</span>
+          </button>
+          <button
+            type="button"
+            className="export-png-action"
+            title="Save image as PNG"
+            aria-label="Save image as PNG"
+            onClick={() => {
+              void (window.lumitraActions?.exportPng() ?? Promise.resolve(requestExportPng()));
+            }}
+          >
+            <ImageDown size={16} />
+            <span>Save PNG</span>
+          </button>
+        </div>
+
+        <div className="project-actions">
+          <button
+            type="button"
+            title="New project"
+            aria-label="New project"
+            onClick={() => setIsNewProjectOpen(true)}
+          >
+            <FilePlus2 size={16} />
           </button>
           <button
             type="button"
@@ -159,17 +175,6 @@ export function RightSidebar() {
             }}
           >
             <ImagePlus size={16} />
-          </button>
-          <button
-            type="button"
-            className="export-png-action"
-            title="Export PNG"
-            aria-label="Export PNG"
-            onClick={() => {
-              void (window.lumitraActions?.exportPng() ?? Promise.resolve(requestExportPng()));
-            }}
-          >
-            <ImageDown size={16} />
           </button>
           <button
             type="button"
@@ -321,7 +326,7 @@ export function RightSidebar() {
           {[...layers].reverse().map((layer) => (
             <div
               key={layer.id}
-              className={`layer-item ${activeLayerId === layer.id ? 'is-active' : ''}`}
+              className={`layer-item ${layer.hasText ? 'is-text-layer' : 'is-raster-layer'} ${activeLayerId === layer.id ? 'is-active' : ''}`}
               onClick={() => setActiveLayer(layer.id)}
               role="button"
               tabIndex={0}
@@ -354,7 +359,9 @@ export function RightSidebar() {
                     event.stopPropagation();
                   }}
                 />
-                <span className="layer-meta">{Math.round(layer.opacity * 100)}%</span>
+                <span className="layer-meta">
+                  {layer.hasText ? 'Text' : 'Raster'} · {Math.round(layer.opacity * 100)}%
+                </span>
                 <input
                   aria-label={`${layer.name} opacity`}
                   min="0"
@@ -460,6 +467,7 @@ export function RightSidebar() {
                   {layer.locked ? <Lock size={14} /> : <Unlock size={14} />}
                 </span>
                 <span
+                  className="layer-delete-control"
                   role="button"
                   tabIndex={0}
                   title="Delete layer"

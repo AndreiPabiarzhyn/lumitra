@@ -1,4 +1,5 @@
 import { Graphics } from 'pixi.js';
+import { useProjectStore } from '../../app/projectStore';
 import { Layer } from '../layers/Layer';
 import {
   clampCaret,
@@ -387,6 +388,7 @@ export class MoveTool implements Tool {
 
     this.context.text.update(object.id, { ...applyTextProperties(this.context.getTextSettings()), content });
     this.context.text.renderLayer(layer, object.id, { commit: false, caretIndex: this.caretIndex });
+    useProjectStore.getState().markDirty();
     this.draw();
   }
 
@@ -404,6 +406,7 @@ export class MoveTool implements Tool {
     this.stopDomEdit();
     this.context.text.renderLayer(layer, null, { commit: true });
     this.context.requestLayerSync();
+    useProjectStore.getState().markDirty();
     this.overlay.clear();
   }
 

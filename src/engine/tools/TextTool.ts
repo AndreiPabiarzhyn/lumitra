@@ -1,5 +1,6 @@
 import { Graphics } from 'pixi.js';
 import { useProjectStore } from '../../app/projectStore';
+import { useToastStore } from '../../app/toastStore';
 import {
   clampCaret,
   deleteAfterCaret,
@@ -146,6 +147,7 @@ export class TextTool implements Tool {
     if (this.context.text.hasTextInLayer(activeLayer.id)) {
       this.context.requestLayerSync();
       useProjectStore.getState().setStatus('Create a new layer before adding another text object');
+      useToastStore.getState().pushToast('Create a new text layer before adding another text object', 'warning');
       return;
     }
 
@@ -154,6 +156,7 @@ export class TextTool implements Tool {
     const layer = shouldCreateTextLayer ? this.context.layers.createEmptyLayer() : activeLayer;
     if (layer !== activeLayer) {
       useProjectStore.getState().setStatus('Created a text layer');
+      useToastStore.getState().pushToast('Created a text layer', 'success');
       this.context.requestLayerSync();
     }
     const textLocal = layer.worldToLocal(point);
@@ -172,6 +175,7 @@ export class TextTool implements Tool {
     this.startObject = { ...object };
     this.context.text.renderLayer(layer, object.id);
     this.context.requestLayerSync();
+    useProjectStore.getState().markDirty();
     this.drawOverlay();
   }
 
@@ -434,6 +438,7 @@ export class TextTool implements Tool {
     const settings = this.context.getTextSettings();
     this.context.text.update(object.id, { ...applyTextProperties(settings), content });
     this.context.text.renderLayer(layer, object.id, { commit: false, caretIndex: this.caretIndex });
+    useProjectStore.getState().markDirty();
     this.drawOverlay();
   }
 
@@ -452,6 +457,7 @@ export class TextTool implements Tool {
     this.stopDomEdit();
     this.context.text.renderLayer(layer, null, { commit: true });
     this.context.requestLayerSync();
+    useProjectStore.getState().markDirty();
     this.overlay.clear();
   }
 

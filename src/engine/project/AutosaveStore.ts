@@ -18,9 +18,23 @@ const openDb = (): Promise<IDBDatabase> => (
 
 export const saveAutosave = async (project: LumitraProject) => {
   const db = await openDb();
-  const transaction = db.transaction(STORE_NAME, 'readwrite');
-  transaction.objectStore(STORE_NAME).put(project, AUTOSAVE_KEY);
-  db.close();
+
+  return new Promise<void>((resolve, reject) => {
+    const transaction = db.transaction(STORE_NAME, 'readwrite');
+    transaction.objectStore(STORE_NAME).put(project, AUTOSAVE_KEY);
+    transaction.oncomplete = () => {
+      db.close();
+      resolve();
+    };
+    transaction.onerror = () => {
+      db.close();
+      reject(transaction.error);
+    };
+    transaction.onabort = () => {
+      db.close();
+      reject(transaction.error);
+    };
+  });
 };
 
 export const loadAutosave = async (): Promise<LumitraProject | null> => {
