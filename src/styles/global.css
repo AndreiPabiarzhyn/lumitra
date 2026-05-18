@@ -1283,6 +1283,22 @@ button {
   font-size: 13px;
 }
 
+.brand-lockup {
+  display: inline-grid;
+  grid-auto-flow: column;
+  gap: 7px;
+  align-items: center;
+}
+
+.brand-lockup img {
+  width: 20px;
+  height: 20px;
+  border-radius: 7px;
+  box-shadow:
+    0 0 18px rgb(94 215 255 / 0.2),
+    0 8px 18px rgb(0 0 0 / 0.2);
+}
+
 .panel-header strong {
   color: #f5f7ff;
   font-size: 18px;

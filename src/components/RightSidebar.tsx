@@ -113,7 +113,10 @@ export function RightSidebar() {
     <aside className="right-sidebar" aria-label="Brush properties">
       <section className="sidebar-window sidebar-actions" aria-label="Project actions">
         <div className="panel-header">
-          <span>Lumitra</span>
+          <span className="brand-lockup">
+            <img src="/lumitra-icon.svg" alt="" />
+            Lumitra
+          </span>
           <strong>Studio</strong>
         </div>
 

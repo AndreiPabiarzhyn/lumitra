@@ -1,0 +1,28 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="108" height="108" rx="30" fill="#080A12"/>
+  <rect x="11" y="11" width="106" height="106" rx="29" stroke="url(#rim)" stroke-width="2"/>
+  <path d="M36 84C47.5 59 66 42.5 94 31" stroke="url(#glow)" stroke-width="18" stroke-linecap="round"/>
+  <path d="M36 84C47.5 59 66 42.5 94 31" stroke="#F6F8FF" stroke-opacity="0.5" stroke-width="6" stroke-linecap="round"/>
+  <path d="M35 86L55 95L46 73L35 86Z" fill="url(#nib)"/>
+  <path d="M86 30L93.5 20L101 30L93.5 40L86 30Z" fill="#5ED7FF"/>
+  <path d="M86 30L93.5 20L101 30L93.5 40L86 30Z" filter="url(#soft)" stroke="white" stroke-opacity="0.45" stroke-width="1.5"/>
+  <defs>
+    <linearGradient id="rim" x1="22" y1="15" x2="111" y2="115" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF7AC4"/>
+      <stop offset="0.45" stop-color="#8F7CFF"/>
+      <stop offset="1" stop-color="#5ED7FF"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="35" y1="86" x2="96" y2="29" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF7AC4"/>
+      <stop offset="0.52" stop-color="#8F7CFF"/>
+      <stop offset="1" stop-color="#5ED7FF"/>
+    </linearGradient>
+    <linearGradient id="nib" x1="35" y1="96" x2="55" y2="73" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C44CFF"/>
+      <stop offset="1" stop-color="#FF7AC4"/>
+    </linearGradient>
+    <filter id="soft" x="68" y="2" width="51" height="56" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+  </defs>
+</svg>
