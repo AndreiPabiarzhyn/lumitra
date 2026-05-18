@@ -1,0 +1,36 @@
+import { BrushPreset } from './BrushSettings';
+
+export const brushPresets: BrushPreset[] = [
+  { id: 'round', name: 'Round', size: 14, opacity: 1, stabilizer: 0.18, spacing: 0.1, softness: 0.04 },
+  { id: 'sketchy', name: 'Sketchy', size: 32, opacity: 0.72, stabilizer: 0.1, spacing: 0.07, softness: 0.46 },
+  { id: 'pencil', name: 'Pencil', size: 4, opacity: 0.66, stabilizer: 0.04, spacing: 0.34, softness: 0 },
+  { id: 'ink', name: 'Ink', size: 9, opacity: 1, stabilizer: 0.64, spacing: 0.045, softness: 0, taper: 0.72, inkDensity: 1 },
+  { id: 'marker', name: 'Marker', size: 24, opacity: 0.28, stabilizer: 0.14, spacing: 0.1, softness: 0.3 },
+  {
+    id: 'airbrush',
+    name: 'Airbrush',
+    size: 58,
+    opacity: 0.72,
+    stabilizer: 0.08,
+    spacing: 0.018,
+    softness: 1,
+    flow: 0.11,
+    density: 0.78,
+    buildup: 0.62,
+    scatter: 0.08,
+  },
+  { id: 'pixel', name: 'Pixel Brush', size: 9, opacity: 1, stabilizer: 0, spacing: 1, softness: 0 },
+  {
+    id: 'calligraphy',
+    name: 'Calligraphy',
+    size: 30,
+    opacity: 0.96,
+    stabilizer: 0.56,
+    spacing: 0.045,
+    softness: 0,
+    nibAngle: -38,
+    widthVariation: 0.82,
+    taper: 0.38,
+    inkDensity: 0.96,
+  },
+];
