@@ -45,6 +45,8 @@ export function TopToolbar() {
   const gradient = useGradientStore();
   const updateSize = (nextSize: number) => setSize(Math.min(160, Math.max(1, Math.round(nextSize))));
   const isBrushTool = activeTool === 'brush' || activeTool === 'mirror-brush';
+  const isEraserTool = activeTool === 'eraser';
+  const isBrushLikeTool = isBrushTool || isEraserTool;
   const isTextTool = activeTool === 'text' || activeTool === 'move';
   const sortedStops = [...gradient.stops].sort((a, b) => a.position - b.position);
   const firstStop = sortedStops[0];
@@ -125,10 +127,10 @@ export function TopToolbar() {
     );
   }
 
-  if (isBrushTool) {
+  if (isBrushLikeTool) {
     return (
-      <div className="top-toolbar top-toolbar-brush" aria-label="Brush options">
-        <span className="top-toolbar-label">Brush</span>
+      <div className="top-toolbar top-toolbar-brush" aria-label={isEraserTool ? 'Eraser options' : 'Brush options'}>
+        <span className="top-toolbar-label">{isEraserTool ? 'Eraser' : 'Brush'}</span>
         <div className="brush-preset-dropdown">
           <span>Type</span>
           <button

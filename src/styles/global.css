@@ -2439,6 +2439,163 @@ button {
   color: #52617a;
 }
 
+:root[data-theme="light"] .transform-action-bar button {
+  color: #233047;
+  border-color: rgb(33 45 70 / 0.16);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.96), rgb(243 246 252 / 0.9)),
+    rgb(255 255 255 / 0.88);
+  box-shadow:
+    0 8px 20px rgb(38 45 70 / 0.08),
+    inset 0 1px 0 rgb(255 255 255 / 0.92);
+}
+
+:root[data-theme="light"] .transform-action-bar .apply {
+  color: #065f46;
+  border-color: rgb(16 185 129 / 0.46);
+  background:
+    linear-gradient(180deg, rgb(222 255 240 / 0.96), rgb(187 247 208 / 0.74)),
+    rgb(220 252 231 / 0.92);
+  box-shadow:
+    0 10px 24px rgb(16 185 129 / 0.16),
+    inset 0 1px 0 rgb(255 255 255 / 0.86);
+}
+
+:root[data-theme="light"] .transform-action-bar .cancel {
+  color: #9d174d;
+  border-color: rgb(236 72 153 / 0.42);
+  background:
+    linear-gradient(180deg, rgb(255 240 247 / 0.98), rgb(252 231 243 / 0.78)),
+    rgb(253 242 248 / 0.92);
+  box-shadow:
+    0 10px 24px rgb(236 72 153 / 0.12),
+    inset 0 1px 0 rgb(255 255 255 / 0.86);
+}
+
+:root[data-theme="light"] .transform-action-bar button:hover {
+  filter: saturate(1.08) contrast(1.02);
+  transform: translateY(-1px);
+}
+
+:root[data-theme="light"] .top-toolbar .brush-library-menu {
+  border: 1px solid rgb(39 50 76 / 0.14);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.98), rgb(238 242 250 / 0.96)),
+    rgb(250 252 255 / 0.96);
+  box-shadow:
+    0 24px 64px rgb(42 50 76 / 0.22),
+    0 0 0 1px rgb(255 255 255 / 0.7),
+    inset 0 1px 0 rgb(255 255 255 / 0.88);
+}
+
+:root[data-theme="light"] .brush-library-header {
+  color: #4b5870;
+}
+
+:root[data-theme="light"] .brush-library-header strong {
+  color: #243048;
+  border-color: rgb(39 50 76 / 0.12);
+  background: rgb(255 255 255 / 0.78);
+}
+
+:root[data-theme="light"] .top-toolbar .brush-library-button {
+  color: #253047;
+  border-color: rgb(37 47 70 / 0.13);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.92), rgb(244 247 253 / 0.86)),
+    rgb(255 255 255 / 0.76);
+  box-shadow:
+    0 8px 18px rgb(38 45 70 / 0.055),
+    inset 0 1px 0 rgb(255 255 255 / 0.86);
+}
+
+:root[data-theme="light"] .top-toolbar .brush-library-button:hover {
+  color: #111827;
+  border-color: rgb(111 95 255 / 0.36);
+  background:
+    linear-gradient(180deg, rgb(244 242 255 / 0.98), rgb(230 237 255 / 0.9)),
+    rgb(255 255 255 / 0.88);
+  box-shadow:
+    0 12px 28px rgb(97 111 255 / 0.13),
+    inset 0 1px 0 rgb(255 255 255 / 0.9);
+}
+
+:root[data-theme="light"] .top-toolbar .brush-library-button.is-active {
+  color: #111827;
+  border-color: rgb(111 95 255 / 0.58);
+  background:
+    linear-gradient(135deg, rgb(224 236 255 / 0.96), rgb(239 236 255 / 0.92)),
+    rgb(255 255 255 / 0.9);
+  box-shadow:
+    0 0 0 1px rgb(111 95 255 / 0.16),
+    0 14px 34px rgb(97 111 255 / 0.16),
+    inset 0 1px 0 rgb(255 255 255 / 0.94);
+}
+
+:root[data-theme="light"] .brush-library-icon {
+  color: #45536b;
+  border-color: rgb(39 50 76 / 0.12);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.86), rgb(234 240 250 / 0.72)),
+    rgb(242 246 252 / 0.86);
+}
+
+:root[data-theme="light"] .brush-library-title strong {
+  color: #202a3f;
+}
+
+:root[data-theme="light"] .brush-library-title em {
+  color: #64718a;
+}
+
+:root[data-theme="light"] .brush-library-preview {
+  background: rgb(38 48 70 / 0.08);
+}
+
+:root[data-theme="light"] .brush-preview-round {
+  background:
+    linear-gradient(90deg, transparent 4%, #2d3650 4% 96%, transparent 96%);
+  box-shadow: 0 0 10px rgb(45 54 80 / 0.1);
+}
+
+:root[data-theme="light"] .brush-preview-sketchy {
+  background:
+    radial-gradient(circle at 7% 50%, rgb(45 54 80 / 0.58) 0 8px, transparent 9px),
+    repeating-linear-gradient(90deg, rgb(45 54 80 / 0.48) 0 7px, rgb(45 54 80 / 0.25) 7px 11px, rgb(45 54 80 / 0.52) 11px 18px);
+}
+
+:root[data-theme="light"] .brush-preview-pencil {
+  background:
+    repeating-linear-gradient(90deg, rgb(45 54 80 / 0.58) 0 3px, transparent 3px 5px),
+    linear-gradient(90deg, transparent 0, rgb(45 54 80 / 0.44) 8% 92%, transparent 100%);
+}
+
+:root[data-theme="light"] .brush-preview-ink {
+  background:
+    linear-gradient(90deg, transparent 0, #2d3650 9%, #2d3650 78%, transparent 100%);
+}
+
+:root[data-theme="light"] .brush-preview-marker {
+  background:
+    linear-gradient(90deg, transparent 2%, rgb(45 54 80 / 0.34) 2% 98%, transparent 98%),
+    linear-gradient(90deg, transparent 10%, rgb(45 54 80 / 0.23) 10% 88%, transparent 88%);
+}
+
+:root[data-theme="light"] .brush-preview-airbrush {
+  background:
+    radial-gradient(ellipse at 50% 50%, rgb(45 54 80 / 0.56), rgb(45 54 80 / 0.22) 32%, rgb(45 54 80 / 0.08) 58%, transparent 82%);
+}
+
+:root[data-theme="light"] .brush-preview-pixel {
+  background:
+    repeating-linear-gradient(90deg, #2d3650 0 9px, transparent 9px 13px);
+}
+
+:root[data-theme="light"] .brush-preview-calligraphy {
+  background:
+    linear-gradient(100deg, transparent 0 4%, #2d3650 11% 88%, transparent 96%);
+}
+
 @media (max-width: 1100px) {
   .top-toolbar {
     left: 88px;

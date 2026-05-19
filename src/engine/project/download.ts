@@ -19,27 +19,9 @@ export const downloadBlob = (blob: Blob, filename: string) => {
 export const saveBlob = async (
   blob: Blob,
   filename: string,
-  pickerTypes?: SaveFilePickerOptions['types'],
+  _pickerTypes?: SaveFilePickerOptions['types'],
 ) => {
-  const showSaveFilePicker = (window as Window & {
-    showSaveFilePicker?: SaveFilePicker;
-  }).showSaveFilePicker;
-
-  if (showSaveFilePicker) {
-    try {
-      const handle = await showSaveFilePicker({
-        suggestedName: filename,
-        types: pickerTypes,
-      });
-      const writable = await handle.createWritable();
-      await writable.write(blob);
-      await writable.close();
-      return;
-    } catch {
-      return;
-    }
-  }
-
+  // Prefer the browser download flow so users get the normal Downloads feedback.
   downloadBlob(blob, filename);
 };
 
@@ -103,10 +85,3 @@ type SaveFilePickerOptions = {
     accept: Record<string, string[]>;
   }>;
 };
-
-type SaveFilePicker = (options?: SaveFilePickerOptions) => Promise<{
-  createWritable: () => Promise<{
-    write: (data: Blob) => Promise<void>;
-    close: () => Promise<void>;
-  }>;
-}>;
