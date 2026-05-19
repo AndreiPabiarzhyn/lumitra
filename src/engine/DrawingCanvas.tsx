@@ -64,13 +64,16 @@ const toToolPointer = (
 ): ToolPointer => {
   const screen = getScreenPoint(event, canvas);
   const world = viewport.screenToWorld(screen.x, screen.y);
+  const pressure = event.pointerType === 'pen'
+    ? Math.min(1, Math.max(0.05, event.pressure || 1))
+    : 1;
 
   return {
     x: world.x,
     y: world.y,
     screenX: screen.x,
     screenY: screen.y,
-    pressure: event.pressure || 1,
+    pressure,
     time: event.timeStamp || performance.now(),
     shiftKey: event.shiftKey,
     button: event.button,
