@@ -5,9 +5,12 @@ export const downloadUrl = (url: string, filename: string) => {
 
   link.href = url;
   link.download = filename;
+  link.style.display = 'none';
   document.body.appendChild(link);
   link.click();
-  link.remove();
+  window.setTimeout(() => {
+    link.parentNode?.removeChild(link);
+  }, 0);
 };
 
 export const downloadBlob = (blob: Blob, filename: string) => {
@@ -30,9 +33,12 @@ export const downloadDataUrl = (dataUrl: string, filename: string) => {
 
   link.href = dataUrl;
   link.download = filename;
+  link.style.display = 'none';
   document.body.appendChild(link);
   link.click();
-  link.remove();
+  window.setTimeout(() => {
+    link.parentNode?.removeChild(link);
+  }, 0);
 };
 
 export const readFileAsText = (file: File): Promise<string> => (

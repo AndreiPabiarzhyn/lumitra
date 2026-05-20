@@ -11,6 +11,8 @@ type Point = {
   y: number;
 };
 
+const MAX_PREVIEW_EDGE = 960;
+
 export class GradientTool implements Tool {
   readonly id = 'gradient';
 
@@ -33,6 +35,14 @@ export class GradientTool implements Tool {
   private previewTexture: Texture | null = null;
 
   private previewSprite: Sprite | null = null;
+
+  private previewScale = 1;
+
+  private queuedPreviewPoint: ToolPointer | null = null;
+
+  private queuedObjectPreview = false;
+
+  private previewFrame: number | null = null;
 
   private readonly renderer = new GradientRenderer();
 
@@ -79,7 +89,7 @@ export class GradientTool implements Tool {
       return;
     }
 
-    this.drawPreview(point);
+    this.queuePreview(point);
   }
 
   onPointerUp(point: ToolPointer) {
@@ -126,19 +136,60 @@ export class GradientTool implements Tool {
   }
 
   private ensurePreview(width: number, height: number) {
-    if (this.previewCanvas?.width === width && this.previewCanvas.height === height && this.previewSprite) {
+    const previewScale = Math.min(1, MAX_PREVIEW_EDGE / Math.max(width, height));
+    const previewWidth = Math.max(1, Math.round(width * previewScale));
+    const previewHeight = Math.max(1, Math.round(height * previewScale));
+
+    if (
+      this.previewCanvas?.width === previewWidth
+      && this.previewCanvas.height === previewHeight
+      && this.previewSprite
+    ) {
+      this.previewScale = previewScale;
       return;
     }
 
     this.destroyPreview();
+    this.previewScale = previewScale;
     this.previewCanvas = document.createElement('canvas');
-    this.previewCanvas.width = width;
-    this.previewCanvas.height = height;
+    this.previewCanvas.width = previewWidth;
+    this.previewCanvas.height = previewHeight;
     this.previewTexture = Texture.from(this.previewCanvas, true);
     this.previewSprite = new Sprite(this.previewTexture);
     this.previewSprite.eventMode = 'none';
     this.previewSprite.alpha = 0.68;
     this.context.overlay.addChildAt(this.previewSprite, 0);
+  }
+
+  private queuePreview(point: ToolPointer) {
+    this.queuedPreviewPoint = point;
+    this.schedulePreviewFrame();
+  }
+
+  private queueObjectPreview() {
+    this.queuedObjectPreview = true;
+    this.schedulePreviewFrame();
+  }
+
+  private schedulePreviewFrame() {
+    if (this.previewFrame !== null) {
+      return;
+    }
+
+    this.previewFrame = requestAnimationFrame(() => {
+      this.previewFrame = null;
+      const nextPoint = this.queuedPreviewPoint;
+      const shouldDrawObject = this.queuedObjectPreview;
+
+      this.queuedPreviewPoint = null;
+      this.queuedObjectPreview = false;
+
+      if (nextPoint) {
+        this.drawPreview(nextPoint);
+      } else if (shouldDrawObject) {
+        this.drawObjectPreview();
+      }
+    });
   }
 
   private drawPreview(point: ToolPointer) {
@@ -156,10 +207,10 @@ export class GradientTool implements Tool {
     }
 
     ctx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
-    this.renderGradient(ctx, this.start, end, false);
+    this.renderGradient(ctx, this.start, end, false, this.previewScale);
     this.previewTexture.source.update();
     this.previewSprite.position.set(layer.transform.x, layer.transform.y);
-    this.previewSprite.scale.set(layer.transform.scaleX, layer.transform.scaleY);
+    this.previewSprite.scale.set(layer.transform.scaleX / this.previewScale, layer.transform.scaleY / this.previewScale);
     this.previewSprite.rotation = layer.transform.rotation;
     this.drawHandles(end);
   }
@@ -185,15 +236,21 @@ export class GradientTool implements Tool {
     }
 
     ctx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
-    this.renderer.render(ctx, object, false);
+    this.renderer.render(ctx, this.scaleGradientObject(object, this.previewScale), false);
     this.previewTexture.source.update();
     this.previewSprite.position.set(layer.transform.x, layer.transform.y);
-    this.previewSprite.scale.set(layer.transform.scaleX, layer.transform.scaleY);
+    this.previewSprite.scale.set(layer.transform.scaleX / this.previewScale, layer.transform.scaleY / this.previewScale);
     this.previewSprite.rotation = layer.transform.rotation;
     this.drawObjectHandles(object);
   }
 
-  private renderGradient(ctx: CanvasRenderingContext2D, startWorld: ToolPointer, endWorld: ToolPointer, alphaLocked: boolean) {
+  private renderGradient(
+    ctx: CanvasRenderingContext2D,
+    startWorld: ToolPointer,
+    endWorld: ToolPointer,
+    alphaLocked: boolean,
+    scale = 1,
+  ) {
     const layer = this.context.layers.getActiveLayer();
 
     if (!layer) {
@@ -202,7 +259,26 @@ export class GradientTool implements Tool {
 
     const start = layer.worldToLocal(startWorld);
     const end = layer.worldToLocal(endWorld);
-    this.renderer.render(ctx, createGradientObject(layer.id, this.context.getGradientSettings(), start, end), alphaLocked);
+    this.renderer.render(
+      ctx,
+      createGradientObject(
+        layer.id,
+        this.context.getGradientSettings(),
+        { ...start, x: start.x * scale, y: start.y * scale },
+        { ...end, x: end.x * scale, y: end.y * scale },
+      ),
+      alphaLocked,
+    );
+  }
+
+  private scaleGradientObject(object: GradientObject, scale: number): GradientObject {
+    return {
+      ...object,
+      startX: object.startX * scale,
+      startY: object.startY * scale,
+      endX: object.endX * scale,
+      endY: object.endY * scale,
+    };
   }
 
   private drawHandles(end: ToolPointer) {
@@ -309,7 +385,7 @@ export class GradientTool implements Tool {
     }
 
     this.pendingObject = next;
-    this.drawObjectPreview();
+    this.queueObjectPreview();
   }
 
   private applyPending() {
@@ -358,6 +434,12 @@ export class GradientTool implements Tool {
     this.objectOrigin = null;
     this.handles.clear();
     this.destroyPreview();
+    this.queuedPreviewPoint = null;
+    this.queuedObjectPreview = false;
+    if (this.previewFrame !== null) {
+      cancelAnimationFrame(this.previewFrame);
+      this.previewFrame = null;
+    }
   }
 
   private destroyPreview() {
@@ -366,6 +448,7 @@ export class GradientTool implements Tool {
     this.previewSprite = null;
     this.previewTexture = null;
     this.previewCanvas = null;
+    this.previewScale = 1;
   }
 
   private onKeyDown = (event: KeyboardEvent) => {

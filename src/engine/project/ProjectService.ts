@@ -5,6 +5,24 @@ import { Viewport } from '../viewport/types';
 import { GradientState } from '../../app/gradientStore';
 import { LumitraProject } from './types';
 
+const serializeBrush = (brush: BrushSettings): BrushSettings => ({
+  color: brush.color,
+  size: brush.size,
+  opacity: brush.opacity,
+  stabilizer: brush.stabilizer,
+  spacing: brush.spacing,
+  softness: brush.softness,
+  flow: brush.flow,
+  density: brush.density,
+  buildup: brush.buildup,
+  scatter: brush.scatter,
+  nibAngle: brush.nibAngle,
+  widthVariation: brush.widthVariation,
+  taper: brush.taper,
+  inkDensity: brush.inkDensity,
+  presetId: brush.presetId,
+});
+
 export class ProjectService {
   constructor(private readonly layers: LayerManager, private readonly text: TextManager) {}
 
@@ -29,7 +47,7 @@ export class ProjectService {
         height: size.height,
       },
       viewport,
-      brush,
+      brush: serializeBrush(brush),
       gradient: {
         type: gradient.type,
         opacity: gradient.opacity,

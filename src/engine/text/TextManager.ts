@@ -12,7 +12,7 @@ export class TextManager {
   private activeId: string | null = null;
 
   create(layer: Layer, x: number, y: number, settings: TextSettings) {
-    const object = createTextObject(layer.id, x, y, settings);
+    const object = createTextObject(layer.id, x, y, applyTextProperties(settings));
     this.objects.set(object.id, object);
     this.activeId = object.id;
     return object;
@@ -144,7 +144,19 @@ export class TextManager {
   }
 
   toJSON(): SerializedTextObject[] {
-    return [...this.objects.values()].map((object) => ({ ...object }));
+    return [...this.objects.values()].map((object) => ({
+      id: object.id,
+      layerId: object.layerId,
+      content: object.content,
+      x: object.x,
+      y: object.y,
+      width: object.width,
+      height: object.height,
+      rotation: object.rotation,
+      scaleX: object.scaleX,
+      scaleY: object.scaleY,
+      ...applyTextProperties(object),
+    }));
   }
 
   restore(objects: SerializedTextObject[] = []) {
