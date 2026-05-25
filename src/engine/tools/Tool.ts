@@ -42,6 +42,7 @@ export interface Tool {
   onPointerDown?(point: ToolPointer): void | Promise<void>;
   onPointerMove?(point: ToolPointer): void | Promise<void>;
   onPointerUp?(point: ToolPointer): void | Promise<void>;
+  onPointerLeave?(): void;
   onWheel?(event: WheelEvent): void;
   onCancel?(): void;
   onActivate?(): void;

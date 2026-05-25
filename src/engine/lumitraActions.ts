@@ -7,6 +7,7 @@ export type LumitraActions = {
   clearLayer: () => Promise<void>;
   deleteLayer: (id: string) => Promise<void>;
   moveLayer: (id: string, direction: 'up' | 'down') => Promise<void>;
+  reorderLayer: (id: string, targetId: string, placement: 'above' | 'below') => Promise<void>;
   saveProject: () => Promise<void>;
   openProject: () => Promise<void>;
   importImage: () => Promise<void>;

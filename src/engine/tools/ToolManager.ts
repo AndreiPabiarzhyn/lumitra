@@ -83,6 +83,18 @@ export class ToolManager {
     void this.activeTool.onPointerUp?.(point);
   }
 
+  pointerEnter() {
+    this.canvas.style.cursor = this.activeTool.cursor;
+  }
+
+  pointerLeave() {
+    if (!this.isPointerDown) {
+      this.canvas.style.cursor = 'default';
+    }
+
+    this.activeTool.onPointerLeave?.();
+  }
+
   wheel(event: WheelEvent) {
     this.activeTool.onWheel?.(event);
   }

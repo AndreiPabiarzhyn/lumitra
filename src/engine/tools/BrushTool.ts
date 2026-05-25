@@ -124,6 +124,11 @@ export class BrushTool implements Tool {
     this.cursorPreview.clear();
   }
 
+  onPointerLeave() {
+    this.context.app.canvas.style.cursor = 'default';
+    this.cursorPreview.clear();
+  }
+
   private handleKeyDown = (event: KeyboardEvent) => {
     if (event.key !== 'Shift' || !this.isDrawing || !this.lastLocalPoint) {
       return;
@@ -175,10 +180,12 @@ export class BrushTool implements Tool {
     const layer = this.context.layers.getActiveLayer();
 
     if (!layer || !this.isInsideLayer(point)) {
+      this.context.app.canvas.style.cursor = 'default';
       this.cursorPreview.clear();
       return;
     }
 
+    this.context.app.canvas.style.cursor = this.cursor;
     const radius = settings.size / 2;
     const strokeWidth = 1 / this.context.viewport.getState().scale;
 

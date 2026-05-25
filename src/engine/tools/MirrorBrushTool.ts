@@ -98,6 +98,11 @@ export class MirrorBrushTool implements Tool {
     this.cursorPreview.clear();
   }
 
+  onPointerLeave() {
+    this.context.app.canvas.style.cursor = 'default';
+    this.cursorPreview.clear();
+  }
+
   private mirrorLocalPoint(layer: Layer, point: BrushPoint): BrushPoint {
     return {
       ...point,
@@ -125,10 +130,12 @@ export class MirrorBrushTool implements Tool {
     const settings = this.context.getBrushSettings();
 
     if (!this.isInsideLayer(point, layer)) {
+      this.context.app.canvas.style.cursor = 'default';
       this.cursorPreview.clear();
       return;
     }
 
+    this.context.app.canvas.style.cursor = this.cursor;
     const radius = settings.size / 2;
     const scale = this.context.viewport.getState().scale;
     const mirrored = this.localToWorld(layer, this.mirrorLocalPoint(layer, layer.worldToLocal(point)));

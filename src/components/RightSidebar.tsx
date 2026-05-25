@@ -7,6 +7,7 @@ import {
   EyeOff,
   FilePlus2,
   FolderOpen,
+  GripVertical,
   ImageDown,
   ImagePlus,
   Lock,
@@ -21,6 +22,7 @@ import {
   Unlock,
 } from 'lucide-react';
 import { useState } from 'react';
+import type { DragEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { useFillStore } from '../app/fillStore';
 import { useLayerStore } from '../app/layerStore';
@@ -33,6 +35,8 @@ export function RightSidebar() {
   const [isNewProjectOpen, setIsNewProjectOpen] = useState(false);
   const [canvasWidth, setCanvasWidth] = useState(1920);
   const [canvasHeight, setCanvasHeight] = useState(1080);
+  const [dragLayerId, setDragLayerId] = useState<string | null>(null);
+  const [dropTarget, setDropTarget] = useState<{ id: string; placement: 'above' | 'below' } | null>(null);
   const layers = useLayerStore((state) => state.layers);
   const activeLayerId = useLayerStore((state) => state.activeLayerId);
   const createLayer = useLayerStore((state) => state.createLayer);
@@ -54,6 +58,39 @@ export function RightSidebar() {
   const activeTool = useToolStore((state) => state.activeTool);
   const fill = useFillStore();
   const smudge = useSmudgeStore();
+  const visibleLayers = [...layers].reverse();
+
+  const updateDropTarget = (event: DragEvent<HTMLElement>, layerId: string) => {
+    const targetLayer = layers.find((layer) => layer.id === layerId);
+
+    if (!dragLayerId || dragLayerId === layerId || targetLayer?.locked) {
+      setDropTarget(null);
+      return;
+    }
+
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const placement = event.clientY < bounds.top + bounds.height / 2 ? 'above' : 'below';
+    setDropTarget({ id: layerId, placement });
+  };
+
+  const dropLayer = (event: DragEvent<HTMLElement>, layerId: string) => {
+    event.preventDefault();
+    const targetLayer = layers.find((layer) => layer.id === layerId);
+
+    if (targetLayer?.locked) {
+      setDragLayerId(null);
+      setDropTarget(null);
+      return;
+    }
+
+    if (dragLayerId && dragLayerId !== layerId) {
+      const placement = dropTarget?.id === layerId ? dropTarget.placement : 'above';
+      void window.lumitraActions?.reorderLayer(dragLayerId, layerId, placement);
+    }
+
+    setDragLayerId(null);
+    setDropTarget(null);
+  };
 
   const createNewProject = () => {
     void window.lumitraActions?.newProject(canvasWidth, canvasHeight);
@@ -301,6 +338,7 @@ export function RightSidebar() {
             type="button"
             title="Duplicate active layer"
             aria-label="Duplicate active layer"
+            disabled={activeLayer?.locked}
             onClick={() => {
               void window.lumitraActions?.duplicateLayer();
             }}
@@ -323,11 +361,37 @@ export function RightSidebar() {
         </div>
 
         <div className="layer-list">
-          {[...layers].reverse().map((layer) => (
+          {visibleLayers.map((layer) => (
             <div
               key={layer.id}
-              className={`layer-item ${layer.hasText ? 'is-text-layer' : 'is-raster-layer'} ${activeLayerId === layer.id ? 'is-active' : ''}`}
+              className={[
+                'layer-item',
+                layer.hasText ? 'is-text-layer' : 'is-raster-layer',
+                layer.locked ? 'is-locked' : '',
+                activeLayerId === layer.id ? 'is-active' : '',
+                dragLayerId === layer.id ? 'is-dragging' : '',
+                dropTarget?.id === layer.id ? `is-drop-${dropTarget.placement}` : '',
+              ].filter(Boolean).join(' ')}
               onClick={() => setActiveLayer(layer.id)}
+              onDragOver={(event) => {
+                if (!dragLayerId || layer.locked) {
+                  return;
+                }
+
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'move';
+                updateDropTarget(event, layer.id);
+              }}
+              onDragLeave={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                  setDropTarget((target) => (target?.id === layer.id ? null : target));
+                }
+              }}
+              onDrop={(event) => dropLayer(event, layer.id)}
+              onDragEnd={() => {
+                setDragLayerId(null);
+                setDropTarget(null);
+              }}
               role="button"
               tabIndex={0}
               onKeyDown={(event) => {
@@ -337,6 +401,25 @@ export function RightSidebar() {
                 }
               }}
             >
+              <span
+                className="layer-drag-handle"
+                draggable={!layer.locked}
+                title={layer.locked ? 'Layer locked' : 'Drag to reorder'}
+                aria-label={layer.locked ? 'Layer locked' : `Drag ${layer.name} to reorder`}
+                onClick={(event) => event.stopPropagation()}
+                onDragStart={(event) => {
+                  if (layer.locked) {
+                    event.preventDefault();
+                    return;
+                  }
+
+                  setDragLayerId(layer.id);
+                  event.dataTransfer.effectAllowed = 'move';
+                  event.dataTransfer.setData('text/plain', layer.id);
+                }}
+              >
+                {layer.locked ? <Lock size={13} /> : <GripVertical size={14} />}
+              </span>
               <span className="layer-preview">
                 {layer.thumbnail && <img src={layer.thumbnail} alt="" />}
                 {layer.hasText && (
@@ -350,7 +433,9 @@ export function RightSidebar() {
                   className="layer-name-input"
                   aria-label={`${layer.name} name`}
                   value={layer.name}
+                  disabled={layer.locked}
                   onClick={(event) => event.stopPropagation()}
+                  onPointerDown={(event) => event.stopPropagation()}
                   onChange={(event) => renameLayer(layer.id, event.target.value)}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter') {
@@ -369,7 +454,10 @@ export function RightSidebar() {
                   step="0.05"
                   type="range"
                   value={layer.opacity}
+                  disabled={layer.locked}
                   onClick={(event) => event.stopPropagation()}
+                  onPointerDown={(event) => event.stopPropagation()}
+                  onDragStart={(event) => event.preventDefault()}
                   onChange={(event) => {
                     setLayerOpacity(layer.id, Number(event.target.value));
                   }}
@@ -380,14 +468,21 @@ export function RightSidebar() {
                   role="button"
                   tabIndex={0}
                   title="Move layer up"
+                  aria-disabled={layer.locked}
                   onClick={(event) => {
                     event.stopPropagation();
+                    if (layer.locked) {
+                      return;
+                    }
                     void window.lumitraActions?.moveLayer(layer.id, 'up');
                   }}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
                       event.stopPropagation();
+                      if (layer.locked) {
+                        return;
+                      }
                       void window.lumitraActions?.moveLayer(layer.id, 'up');
                     }
                   }}
@@ -398,14 +493,21 @@ export function RightSidebar() {
                   role="button"
                   tabIndex={0}
                   title="Move layer down"
+                  aria-disabled={layer.locked}
                   onClick={(event) => {
                     event.stopPropagation();
+                    if (layer.locked) {
+                      return;
+                    }
                     void window.lumitraActions?.moveLayer(layer.id, 'down');
                   }}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
                       event.stopPropagation();
+                      if (layer.locked) {
+                        return;
+                      }
                       void window.lumitraActions?.moveLayer(layer.id, 'down');
                     }
                   }}
@@ -431,22 +533,30 @@ export function RightSidebar() {
                   {layer.visible ? <Eye size={14} /> : <EyeOff size={14} />}
                 </span>
                 <span
+                  className={`alpha-lock-control ${layer.alphaLocked ? 'is-on' : 'is-off'}`}
                   role="button"
                   tabIndex={0}
                   title={layer.alphaLocked ? 'Disable alpha lock' : 'Enable alpha lock'}
+                  aria-disabled={layer.locked}
                   onClick={(event) => {
                     event.stopPropagation();
+                    if (layer.locked) {
+                      return;
+                    }
                     toggleLayerAlphaLocked(layer.id);
                   }}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
                       event.stopPropagation();
+                      if (layer.locked) {
+                        return;
+                      }
                       toggleLayerAlphaLocked(layer.id);
                     }
                   }}
                 >
-                  <SquareDashedBottom size={14} opacity={layer.alphaLocked ? 1 : 0.5} />
+                  <SquareDashedBottom size={14} />
                 </span>
                 <span
                   role="button"
@@ -471,6 +581,7 @@ export function RightSidebar() {
                   role="button"
                   tabIndex={0}
                   title="Delete layer"
+                  aria-disabled={layer.locked}
                   onClick={(event) => {
                     event.stopPropagation();
                     if (window.confirm('Сохрани проект перед удалением слоя. Удалить слой?')) {

@@ -56,7 +56,7 @@ export const pickProjectFile = (): Promise<File | null> => (
     const input = document.createElement('input');
 
     input.type = 'file';
-    input.accept = '.lumitra,application/json';
+    input.accept = '.lumitra,application/json,image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp';
     input.style.display = 'none';
     input.onchange = () => {
       const file = input.files?.[0] ?? null;

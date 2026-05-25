@@ -151,7 +151,7 @@ export class LayerManager {
   duplicateActiveLayer(): Layer | null {
     const activeLayer = this.getActiveLayer();
 
-    if (!activeLayer) {
+    if (!activeLayer || activeLayer.locked) {
       return null;
     }
 
@@ -212,18 +212,45 @@ export class LayerManager {
   moveLayer(id: string, direction: 'up' | 'down') {
     const index = this.layers.findIndex((layer) => layer.id === id);
 
-    if (index < 0) {
+    if (index < 0 || this.layers[index].locked) {
       return false;
     }
 
     const nextIndex = direction === 'up' ? index + 1 : index - 1;
 
-    if (nextIndex < 0 || nextIndex >= this.layers.length) {
+    if (nextIndex < 0 || nextIndex >= this.layers.length || this.layers[nextIndex].locked) {
       return false;
     }
 
     const [layer] = this.layers.splice(index, 1);
     this.layers.splice(nextIndex, 0, layer);
+    return true;
+  }
+
+  moveLayerRelative(id: string, targetId: string, placement: 'above' | 'below') {
+    if (id === targetId) {
+      return false;
+    }
+
+    const layerIndex = this.layers.findIndex((layer) => layer.id === id);
+    const targetIndex = this.layers.findIndex((layer) => layer.id === targetId);
+
+    if (layerIndex < 0 || targetIndex < 0) {
+      return false;
+    }
+
+    if (this.layers[layerIndex].locked || this.layers[targetIndex].locked) {
+      return false;
+    }
+
+    const [layer] = this.layers.splice(layerIndex, 1);
+    const adjustedTargetIndex = this.layers.findIndex((item) => item.id === targetId);
+    const insertIndex = placement === 'above'
+      ? adjustedTargetIndex + 1
+      : adjustedTargetIndex;
+
+    this.layers.splice(insertIndex, 0, layer);
+    this.onLayerChange?.();
     return true;
   }
 

@@ -31,11 +31,19 @@ import { ViewportController } from './viewport/ViewportController';
 const CANVAS_WIDTH = 1920;
 const CANVAS_HEIGHT = 1080;
 
+const readLayoutInset = (name: string, fallback: number) => {
+  const shell = document.querySelector<HTMLElement>('.app-shell');
+  const source = shell ?? document.documentElement;
+  const value = Number.parseFloat(getComputedStyle(source).getPropertyValue(name));
+
+  return Number.isFinite(value) ? value : fallback;
+};
+
 const getCenteredViewport = (width: number, height: number) => {
-  const leftGutter = 96;
-  const rightGutter = 368;
-  const topGutter = 88;
-  const bottomGutter = 74;
+  const leftGutter = readLayoutInset('--canvas-left-inset', 96);
+  const rightGutter = readLayoutInset('--canvas-right-inset', 368);
+  const topGutter = readLayoutInset('--canvas-top-inset', 88);
+  const bottomGutter = readLayoutInset('--canvas-bottom-inset', 92);
   const workspaceWidth = Math.max(320, window.innerWidth - leftGutter - rightGutter);
   const workspaceHeight = Math.max(260, window.innerHeight - topGutter - bottomGutter);
   const scale = Math.max(0.08, Math.min(1, workspaceWidth / width, workspaceHeight / height) * 0.92);
@@ -178,6 +186,14 @@ export function DrawingCanvas() {
           stabilizer: brushRef.current.stabilizer,
           spacing: brushRef.current.spacing,
           softness: brushRef.current.softness,
+          flow: brushRef.current.flow,
+          density: brushRef.current.density,
+          buildup: brushRef.current.buildup,
+          scatter: brushRef.current.scatter,
+          nibAngle: brushRef.current.nibAngle,
+          widthVariation: brushRef.current.widthVariation,
+          taper: brushRef.current.taper,
+          inkDensity: brushRef.current.inkDensity,
           presetId: brushRef.current.presetId,
         },
         gradientRef.current,
@@ -278,6 +294,44 @@ export function DrawingCanvas() {
       syncLayerStoreFromManager();
       useProjectStore.getState().markSaved();
       notify(`New project ${width}x${height}`, 'success');
+    };
+
+    const createProjectFromImage = async (file: File) => {
+      const manager = layerManagerRef.current;
+      const renderer = layerRendererRef.current;
+      const viewport = viewportRef.current;
+      const history = historyRef.current;
+
+      if (!manager || !renderer || !viewport || !history) {
+        return;
+      }
+
+      const bitmap = await createImageBitmap(file);
+
+      try {
+        manager.reset(bitmap.width, bitmap.height);
+        textManagerRef.current?.restore([]);
+        const layer = manager.getActiveLayer();
+
+        if (layer) {
+          layer.name = file.name.replace(/\.[^.]+$/, '') || 'Imported image';
+          layer.context.clearRect(0, 0, layer.canvas.width, layer.canvas.height);
+          layer.context.drawImage(bitmap, 0, 0);
+          layer.markDirtyNow();
+        }
+
+        renderer.setCanvasFrame(bitmap.width, bitmap.height);
+        renderer.sync(manager.getLayers());
+        viewport.setState(getCenteredViewport(bitmap.width, bitmap.height));
+        history.clear();
+        history.capture();
+        syncLayerStoreFromManager();
+        useProjectStore.getState().markDirty();
+        scheduleAutosave();
+        notify(`Image opened ${bitmap.width}x${bitmap.height}`, 'success');
+      } finally {
+        bitmap.close();
+      }
     };
 
     const centerCanvas = async () => {
@@ -396,6 +450,21 @@ export function DrawingCanvas() {
       }
     };
 
+    const reorderLayer = async (id: string, targetId: string, placement: 'above' | 'below') => {
+      const manager = layerManagerRef.current;
+
+      if (!manager || id === targetId) {
+        return;
+      }
+
+      historyRef.current?.capture();
+      if (manager.moveLayerRelative(id, targetId, placement)) {
+        layerRendererRef.current?.sync(manager.getLayers());
+        syncLayerStoreFromManager();
+        markDirty('Layer reordered');
+      }
+    };
+
     const saveProject = async () => {
       const project = createProject();
 
@@ -419,6 +488,11 @@ export function DrawingCanvas() {
       const file = await pickProjectFile();
 
       if (!file) {
+        return;
+      }
+
+      if (file.type.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(file.name)) {
+        await createProjectFromImage(file);
         return;
       }
 
@@ -598,6 +672,14 @@ export function DrawingCanvas() {
       }
     };
 
+    const pointerEnter = () => {
+      toolManagerRef.current?.pointerEnter();
+    };
+
+    const pointerLeave = () => {
+      toolManagerRef.current?.pointerLeave();
+    };
+
     const pointerUp = (event: PointerEvent) => {
       const viewport = viewportRef.current;
 
@@ -758,6 +840,8 @@ export function DrawingCanvas() {
       app.canvas.dataset.ready = 'true';
 
       app.canvas.addEventListener('pointerdown', pointerDown);
+      app.canvas.addEventListener('pointerenter', pointerEnter);
+      app.canvas.addEventListener('pointerleave', pointerLeave);
       app.canvas.addEventListener('pointermove', pointerMove);
       app.canvas.addEventListener('pointerup', pointerUp);
       app.canvas.addEventListener('pointercancel', pointerUp);
@@ -781,6 +865,7 @@ export function DrawingCanvas() {
         clearLayer,
         deleteLayer,
         moveLayer,
+        reorderLayer,
         saveProject,
         openProject,
         importImage,
@@ -805,6 +890,8 @@ export function DrawingCanvas() {
           window.clearTimeout(autosaveDebounce);
         }
         app.canvas.removeEventListener('pointerdown', pointerDown);
+        app.canvas.removeEventListener('pointerenter', pointerEnter);
+        app.canvas.removeEventListener('pointerleave', pointerLeave);
         app.canvas.removeEventListener('pointermove', pointerMove);
         app.canvas.removeEventListener('pointerup', pointerUp);
         app.canvas.removeEventListener('pointercancel', pointerUp);

@@ -79,6 +79,11 @@ export class SmudgeTool implements Tool {
     this.cursorPreview.clear();
   }
 
+  onPointerLeave() {
+    this.context.app.canvas.style.cursor = 'default';
+    this.cursorPreview.clear();
+  }
+
   private prepareBuffers() {
     const size = Math.max(4, Math.ceil(this.context.getBrushSettings().size * 2));
     this.buffer = document.createElement('canvas');
@@ -141,6 +146,13 @@ export class SmudgeTool implements Tool {
   }
 
   private drawCursor(point: ToolPointer) {
+    if (!this.isInsideLayer(point)) {
+      this.context.app.canvas.style.cursor = 'default';
+      this.cursorPreview.clear();
+      return;
+    }
+
+    this.context.app.canvas.style.cursor = this.cursor;
     const radius = this.context.getBrushSettings().size / 2;
     const scale = this.context.viewport.getState().scale;
 
@@ -149,5 +161,17 @@ export class SmudgeTool implements Tool {
       .stroke({ color: 0x05070d, alpha: 0.82, width: 3 / scale })
       .circle(point.x, point.y, radius)
       .stroke({ color: 0xffffff, alpha: 0.9, width: 1.2 / scale });
+  }
+
+  private isInsideLayer(point: ToolPointer) {
+    const layer = this.context.layers.getActiveLayer();
+
+    if (!layer) {
+      return false;
+    }
+
+    const local = layer.worldToLocal(point);
+
+    return local.x >= 0 && local.y >= 0 && local.x <= layer.canvas.width && local.y <= layer.canvas.height;
   }
 }

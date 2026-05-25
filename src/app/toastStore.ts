@@ -14,12 +14,43 @@ type ToastState = {
   removeToast: (id: string) => void;
 };
 
+const MAX_TOASTS = 2;
+const TOAST_TTL = 2400;
+const toastTimers = new Map<string, number>();
+
+const clearToastTimer = (id: string) => {
+  const timer = toastTimers.get(id);
+
+  if (timer) {
+    window.clearTimeout(timer);
+    toastTimers.delete(id);
+  }
+};
+
 export const useToastStore = create<ToastState>((set, get) => ({
   toasts: [],
   pushToast: (title, tone = 'info') => {
     const id = `toast-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
-    set((state) => ({ toasts: [...state.toasts, { id, title, tone }].slice(-4) }));
-    window.setTimeout(() => get().removeToast(id), 3200);
+    set((state) => {
+      const next = [
+        ...state.toasts.filter((toast) => toast.title !== title),
+        { id, title, tone },
+      ].slice(-MAX_TOASTS);
+      const visibleIds = new Set(next.map((toast) => toast.id));
+
+      state.toasts.forEach((toast) => {
+        if (!visibleIds.has(toast.id)) {
+          clearToastTimer(toast.id);
+        }
+      });
+
+      return { toasts: next };
+    });
+
+    toastTimers.set(id, window.setTimeout(() => get().removeToast(id), TOAST_TTL));
   },
-  removeToast: (id) => set((state) => ({ toasts: state.toasts.filter((toast) => toast.id !== id) })),
+  removeToast: (id) => {
+    clearToastTimer(id);
+    set((state) => ({ toasts: state.toasts.filter((toast) => toast.id !== id) }));
+  },
 }));
