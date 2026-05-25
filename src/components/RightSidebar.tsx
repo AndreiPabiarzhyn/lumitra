@@ -368,6 +368,7 @@ export function RightSidebar() {
                 'layer-item',
                 layer.hasText ? 'is-text-layer' : 'is-raster-layer',
                 layer.locked ? 'is-locked' : '',
+                layer.alphaLocked ? 'is-alpha-locked' : '',
                 activeLayerId === layer.id ? 'is-active' : '',
                 dragLayerId === layer.id ? 'is-dragging' : '',
                 dropTarget?.id === layer.id ? `is-drop-${dropTarget.placement}` : '',
@@ -536,7 +537,8 @@ export function RightSidebar() {
                   className={`alpha-lock-control ${layer.alphaLocked ? 'is-on' : 'is-off'}`}
                   role="button"
                   tabIndex={0}
-                  title={layer.alphaLocked ? 'Disable alpha lock' : 'Enable alpha lock'}
+                  title="Paint only existing pixels"
+                  aria-label={`${layer.name}: Paint only existing pixels ${layer.alphaLocked ? 'on' : 'off'}`}
                   aria-disabled={layer.locked}
                   onClick={(event) => {
                     event.stopPropagation();

@@ -32,12 +32,14 @@ const premultipliedDistance = (data: Uint8ClampedArray, pixel: number, target: R
   return Math.sqrt(dr * dr + dg * dg + db * db + da * da);
 };
 
-const writePixel = (data: Uint8ClampedArray, pixel: number, fill: Rgba) => {
+const writePixel = (data: Uint8ClampedArray, pixel: number, fill: Rgba, preserveAlpha = false) => {
   const index = pixel * 4;
+  const alpha = preserveAlpha ? data[index + 3] : fill[3];
+
   data[index] = fill[0];
   data[index + 1] = fill[1];
   data[index + 2] = fill[2];
-  data[index + 3] = fill[3];
+  data[index + 3] = alpha;
 };
 
 export class FillTool implements Tool {
@@ -94,7 +96,7 @@ export class FillTool implements Tool {
         continue;
       }
 
-      writePixel(writeData, pixel, fill);
+      writePixel(writeData, pixel, fill, layer.alphaLocked);
       changed = true;
     }
 
@@ -257,7 +259,7 @@ export class FillTool implements Tool {
             continue;
           }
 
-          writePixel(writeData, pixel, fill);
+          writePixel(writeData, pixel, fill, alphaLocked);
           nextMask[pixel] = 1;
           changed = true;
         }

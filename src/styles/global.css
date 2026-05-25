@@ -138,6 +138,24 @@ button {
   outline-color: rgb(113 95 255 / 0.56);
 }
 
+:root[data-theme="light"] .layer-item.is-alpha-locked {
+  border-color: rgb(14 165 233 / 0.34);
+  box-shadow:
+    inset 0 0 0 1px rgb(14 165 233 / 0.08),
+    0 12px 28px rgb(14 165 233 / 0.09);
+}
+
+:root[data-theme="light"] .layer-item.is-alpha-locked.is-active {
+  border-color: rgb(14 165 233 / 0.62);
+  background:
+    linear-gradient(135deg, rgb(224 242 254 / 0.76), rgb(237 233 254 / 0.72)),
+    rgb(255 255 255 / 0.74);
+  box-shadow:
+    inset 0 0 0 1px rgb(14 165 233 / 0.16),
+    0 0 24px rgb(14 165 233 / 0.18),
+    0 12px 30px rgb(38 45 70 / 0.13);
+}
+
 :root[data-theme="light"] .layer-item.is-locked {
   color: #667085;
   border-color: rgb(190 126 30 / 0.24);
@@ -205,14 +223,14 @@ button {
 }
 
 :root[data-theme="light"] .layer-controls .alpha-lock-control.is-on {
-  color: #07344a;
-  border-color: rgb(14 165 233 / 0.55);
+  color: #062b3f;
+  border-color: rgb(14 165 233 / 0.72);
   background:
-    linear-gradient(135deg, rgb(186 230 253 / 0.98), rgb(221 214 254 / 0.94)),
+    linear-gradient(135deg, rgb(186 230 253 / 1), rgb(221 214 254 / 0.98)),
     rgb(224 242 254 / 0.92);
   box-shadow:
-    0 0 0 1px rgb(14 165 233 / 0.14),
-    0 0 18px rgb(14 165 233 / 0.2);
+    0 0 0 1px rgb(14 165 233 / 0.18),
+    0 0 20px rgb(14 165 233 / 0.26);
 }
 
 :root[data-theme="light"] .color-preview,
@@ -1925,6 +1943,24 @@ button {
   box-shadow: 0 10px 28px rgb(60 67 130 / 0.18);
 }
 
+.layer-item.is-alpha-locked {
+  border-color: rgb(94 215 255 / 0.28);
+  box-shadow:
+    inset 0 0 0 1px rgb(94 215 255 / 0.08),
+    0 10px 28px rgb(94 215 255 / 0.08);
+}
+
+.layer-item.is-alpha-locked.is-active {
+  border-color: rgb(94 215 255 / 0.66);
+  background:
+    linear-gradient(135deg, rgb(94 215 255 / 0.12), rgb(143 124 255 / 0.16)),
+    rgb(143 124 255 / 0.1);
+  box-shadow:
+    inset 0 0 0 1px rgb(94 215 255 / 0.18),
+    0 0 26px rgb(94 215 255 / 0.16),
+    0 12px 32px rgb(60 67 130 / 0.18);
+}
+
 .layer-item.is-locked {
   color: #7f8ba3;
   border-color: rgb(255 207 122 / 0.22);
@@ -2236,14 +2272,14 @@ button {
 }
 
 .layer-controls .alpha-lock-control.is-on {
-  color: #101522;
-  border-color: rgb(94 215 255 / 0.72);
+  color: #04121f;
+  border-color: rgb(94 215 255 / 0.9);
   background:
-    linear-gradient(135deg, rgb(94 215 255 / 0.95), rgb(143 124 255 / 0.82)),
+    linear-gradient(135deg, rgb(125 231 255 / 0.98), rgb(143 124 255 / 0.92)),
     #5ed7ff;
   box-shadow:
-    0 0 0 1px rgb(255 255 255 / 0.12),
-    0 0 18px rgb(94 215 255 / 0.34);
+    0 0 0 1px rgb(255 255 255 / 0.22),
+    0 0 20px rgb(94 215 255 / 0.5);
 }
 
 .canvas-controls {

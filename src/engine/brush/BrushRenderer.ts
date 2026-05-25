@@ -62,7 +62,7 @@ export class BrushRenderer {
     ctx.globalCompositeOperation = mode;
     ctx.globalAlpha = clamp(opacity * sample.alpha, 0.01, 1);
 
-    if (softness > 0 && mode === 'source-over') {
+    if (softness > 0 && mode !== 'destination-out') {
       const gradient = ctx.createRadialGradient(sample.x, sample.y, 0, sample.x, sample.y, sample.radius);
       gradient.addColorStop(0, settings.color);
       gradient.addColorStop(Math.max(0.04, 1 - softness), settings.color);
