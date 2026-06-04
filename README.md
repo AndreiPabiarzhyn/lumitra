@@ -26,6 +26,10 @@ The project focuses on a lightweight creative workspace: canvas drawing, layers,
 
 ## Getting Started
 
+## 🚀 Live Demo
+
+https://lumitra-tau.vercel.app
+
 Install dependencies:
 
 ```bash
