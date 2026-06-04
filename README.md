@@ -1,44 +1,30 @@
 # Lumitra
 
-An AI-powered platform for learning, creating, and publishing web projects directly in the browser.
+Lumitra is a browser-based drawing and image editing app built with React, TypeScript, Vite, PixiJS, and Zustand.
 
-Lumitra combines a modern coding workspace, live preview, project management tools, and an AI mentor into a single environment designed for students, educators, and beginner developers.
+The project focuses on a lightweight creative workspace: canvas drawing, layers, text, gradients, transforms, and project export/import directly in the browser.
 
-## ✨ Features
+## Features
 
-* Live HTML, CSS, and JavaScript editing
-* Instant project preview
-* AI mentor for guidance and feedback
-* Modern browser-based workspace
-* Project saving and publishing
-* Responsive interface
-* Fast cloud deployment
-* Student-friendly learning experience
+- Drawing canvas powered by PixiJS
+- Brush, mirror brush, eraser, smudge, fill, eyedropper, hand, move, transform, text, line, rectangle, and ellipse tools
+- Brush presets with size, opacity, and stabilizer controls
+- Layer management and rendering
+- Text editing with font, alignment, and styling controls
+- Linear, radial, angle, diamond, and reflected gradients
+- Project save/load support with the `.lumitra` format
+- Toast notifications, status bar, splash screen, and theme/help controls
 
-## 🚀 Live Demo
+## Tech Stack
 
-https://lumitra-tau.vercel.app
+- React 19
+- TypeScript
+- Vite
+- PixiJS
+- Zustand
+- Lucide React icons
 
-## 🛠 Tech Stack
-
-### Frontend
-
-* React
-* TypeScript
-* Vite
-
-### Deployment
-
-* Vercel
-
-## 📦 Installation
-
-Clone the repository:
-
-```bash
-git clone https://github.com/AndreiPabiarzhyn/lumitra.git
-cd lumitra
-```
+## Getting Started
 
 Install dependencies:
 
@@ -46,7 +32,7 @@ Install dependencies:
 npm install
 ```
 
-Run development server:
+Start the development server:
 
 ```bash
 npm run dev
@@ -58,63 +44,31 @@ Build for production:
 npm run build
 ```
 
-Preview production build:
+Preview the production build:
 
 ```bash
 npm run preview
 ```
 
-## 🎯 Vision
+## Project Structure
 
-Lumitra was created to make web development more accessible for beginners.
+```text
+src/
+  app/          Zustand stores for tools, brush settings, colors, layers, text, projects, and UI state
+  components/   React UI panels, toolbars, controls, notifications, and shell elements
+  engine/       Canvas, brush, layer, gradient, text, project, viewport, history, and tool logic
+  styles/       Global application styles
+public/         App icon and static assets
+```
 
-The goal is to provide a single workspace where users can:
+## Project Files
 
-* learn programming;
-* experiment safely;
-* receive AI assistance;
-* create real projects;
-* publish their work online.
+Lumitra saves projects with the `.lumitra` extension. The current project package format stores project data in a small ZIP-like package containing Lumitra metadata and project JSON.
 
-## 📚 Educational Focus
+## Development Notes
 
-Lumitra is especially suited for:
-
-* coding schools;
-* online learning platforms;
-* teachers and mentors;
-* beginner developers;
-* students building their first portfolio projects.
-
-## 🗺 Roadmap
-
-### Current
-
-* Project editor
-* Live preview
-* Project saving
-* Deployment support
-
-### Planned
-
-* Advanced AI mentor
-* Project templates
-* Collaborative editing
-* Classroom management tools
-* Learning analytics
-* Portfolio generation
-* Community project gallery
-
-## 🤝 Contributing
-
-Contributions, ideas, and feedback are welcome.
-
-Feel free to open an issue or submit a pull request.
-
-## 📄 License
-
-MIT License
-
----
-
-Built with ❤️ by Andrei Pabiarzhyn
+- The app entry point is `src/main.tsx`.
+- The main shell composition lives in `src/App.tsx`.
+- Canvas behavior is centered around `src/engine/DrawingCanvas.tsx`.
+- Tool implementations live in `src/engine/tools/`.
+- Project serialization lives in `src/engine/project/`.
