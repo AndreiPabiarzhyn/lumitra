@@ -31,10 +31,10 @@ The project focuses on a lightweight creative workspace: canvas drawing, layers,
 https://lumitra-tau.vercel.app
 
 ## Deployment
-##№ Vercel
+### Vercel
 📦 Installation
 
-##№ Clone the repository:
+### Clone the repository:
 
 git clone https://github.com/AndreiPabiarzhyn/lumitra.git
 
