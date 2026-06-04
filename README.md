@@ -1,44 +1,130 @@
-# Lumitra
+# Lumitra Studio
 
-Lumitra is a browser-based drawing and image editing app built with React, TypeScript, Vite, PixiJS, and Zustand.
+A modern browser-based drawing and image editing application built with React, TypeScript, PixiJS, and Zustand.
 
-The project focuses on a lightweight creative workspace: canvas drawing, layers, text, gradients, transforms, and project export/import directly in the browser.
+Lumitra Studio provides a fast and lightweight creative workspace directly in the browser. Users can draw, edit images, work with layers, create gradients, add text, and save projects using the native `.lumitra` format.
 
-## Features
+![Lumitra Studio](./docs/screenshot.png)
 
-- Drawing canvas powered by PixiJS
-- Brush, mirror brush, eraser, smudge, fill, eyedropper, hand, move, transform, text, line, rectangle, and ellipse tools
-- Brush presets with size, opacity, and stabilizer controls
-- Layer management and rendering
-- Text editing with font, alignment, and styling controls
-- Linear, radial, angle, diamond, and reflected gradients
-- Project save/load support with the `.lumitra` format
-- Toast notifications, status bar, splash screen, and theme/help controls
+## ✨ Features
 
-## Tech Stack
+### 🎨 Drawing Tools
 
-- React 19
-- TypeScript
-- Vite
-- PixiJS
-- Zustand
-- Lucide React icons
+* Brush
+* Mirror Brush
+* Eraser
+* Smudge Tool
+* Fill Tool
+* Eyedropper
+* Hand Tool
+* Move Tool
+* Transform Tool
+* Text Tool
+* Line Tool
+* Rectangle Tool
+* Ellipse Tool
 
-## Getting Started
+### 🖌 Brush Engine
+
+* Custom brush presets
+* Adjustable size
+* Opacity control
+* Stroke stabilizer
+* Real-time rendering
+
+### 🗂 Layer System
+
+* Multiple layers
+* Layer visibility
+* Layer opacity
+* Layer duplication
+* Layer reordering
+* Layer locking
+
+### 🔤 Text Editing
+
+* Text insertion
+* Font selection
+* Alignment controls
+* Styling options
+* Editable text objects
+
+### 🌈 Gradient Engine
+
+Supported gradient types:
+
+* Linear
+* Radial
+* Angle
+* Diamond
+* Reflected
+
+### 💾 Project Management
+
+* Save projects
+* Load projects
+* Export PNG
+* Native `.lumitra` project format
+* Automatic project recovery
+
+### 🎯 User Experience
+
+* Modern dark interface
+* Responsive layout
+* Toast notifications
+* Status bar
+* Splash screen
+* Theme controls
+* Keyboard-friendly workflow
+
+---
 
 ## 🚀 Live Demo
 
 https://lumitra-tau.vercel.app
 
-## Deployment
-### Vercel
-📦 Installation
+---
 
-### Clone the repository:
+## 🛠 Technology Stack
 
+### Frontend
+
+* React 18
+* TypeScript
+* Vite
+
+### Graphics
+
+* PixiJS
+
+### State Management
+
+* Zustand
+
+### UI
+
+* Radix UI
+* shadcn/ui
+* Lucide React
+
+### Utilities
+
+* JSZip
+* File Saver
+* React Hook Form
+* Zod
+* TanStack Query
+
+---
+
+## 📦 Installation
+
+Clone the repository:
+
+```bash
 git clone https://github.com/AndreiPabiarzhyn/lumitra.git
-
 cd lumitra
+```
 
 Install dependencies:
 
@@ -46,43 +132,104 @@ Install dependencies:
 npm install
 ```
 
-Start the development server:
+Run development server:
 
 ```bash
 npm run dev
 ```
 
-Build for production:
+Build production version:
 
 ```bash
 npm run build
 ```
 
-Preview the production build:
+Preview production build:
 
 ```bash
 npm run preview
 ```
 
-## Project Structure
+Run tests:
+
+```bash
+npm run test
+```
+
+---
+
+## 📁 Project Structure
 
 ```text
 src/
-  app/          Zustand stores for tools, brush settings, colors, layers, text, projects, and UI state
-  components/   React UI panels, toolbars, controls, notifications, and shell elements
-  engine/       Canvas, brush, layer, gradient, text, project, viewport, history, and tool logic
-  styles/       Global application styles
-public/         App icon and static assets
+├── app/          Zustand stores and application state
+├── components/   React UI components
+├── engine/       Drawing, rendering and tool logic
+├── styles/       Global styles
+└── main.tsx      Application entry point
+
+public/
+└── assets
 ```
 
-## Project Files
+---
 
-Lumitra saves projects with the `.lumitra` extension. The current project package format stores project data in a small ZIP-like package containing Lumitra metadata and project JSON.
+## 📄 Lumitra Project Format
 
-## Development Notes
+Lumitra projects are stored using the `.lumitra` format.
 
-- The app entry point is `src/main.tsx`.
-- The main shell composition lives in `src/App.tsx`.
-- Canvas behavior is centered around `src/engine/DrawingCanvas.tsx`.
-- Tool implementations live in `src/engine/tools/`.
-- Project serialization lives in `src/engine/project/`.
+The format contains:
+
+* Project metadata
+* Layer information
+* Canvas settings
+* Drawing data
+* Text objects
+* Editor state
+
+Projects can be saved locally and reopened later without losing editing capabilities.
+
+---
+
+## 🗺 Roadmap
+
+### Completed
+
+* [x] Drawing engine
+* [x] Layer system
+* [x] Text tool
+* [x] Gradient support
+* [x] Project save/load
+* [x] PNG export
+* [x] Automatic recovery
+
+### Planned
+
+* [ ] Animation timeline
+* [ ] GIF export workflow
+* [ ] Selection tools
+* [ ] Filters and effects
+* [ ] Cloud project storage
+* [ ] Collaboration mode
+* [ ] Asset library
+* [ ] Plugin system
+
+---
+
+## 🎯 Vision
+
+Lumitra Studio aims to provide creators with a lightweight alternative to traditional desktop graphics editors.
+
+The project focuses on speed, accessibility, and a clean user experience while keeping the entire workflow inside the browser.
+
+---
+
+## 👨‍💻 Author
+
+Andrei Pabiarzhyn
+
+---
+
+## 📜 License
+
+MIT License
