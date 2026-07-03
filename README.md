@@ -6,9 +6,9 @@ Lumitra Studio provides a fast and lightweight creative workspace directly in th
 
 ## Development
 
-This project was developed using a modern AI-assisted workflow with Codex CLI.
+This project was developed using a modern AI-assisted workflow with Codex.
 
-I used Codex CLI to explore implementation approaches, generate boilerplate, refactor code, and speed up development, while making all architectural decisions, reviewing the generated code, and integrating the final implementation.
+I used Codex to explore implementation approaches, generate boilerplate, refactor code, and speed up development, while making all architectural decisions, reviewing the generated code, and integrating the final implementation.
 
 ![Lumitra Studio](./docs/image1.png)
 ![Lumitra Studio](./docs/image2.png)
